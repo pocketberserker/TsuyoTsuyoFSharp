@@ -40,7 +40,8 @@ type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
 let mutable fieldTsuyo:Tsuyo list = []
 
-let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) =
+type Rotate = | Right | Left
+let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
 
   let collide' num expr1 expr2 pattarn1 pattarn2 other = 
     match tsuyo1.Pos % RowNum = num with 
@@ -53,52 +54,57 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) =
       | true -> pattarn1
       | false -> other
 
+  // trueで衝突して回転不可能、falseで衝突するが回転可能
   let (|RightCollide|LeftCollide|Other|) (pos:SndTsuyoPos) : Choice<bool,bool,unit> =
     match pos with
     | SndTsuyoPos.Up ->
-      collide' (RowNum - 1) (tsuyo1.Pos - 1) (tsuyo1.Pos + 1) (RightCollide true) (RightCollide false) Other
+      match rot with
+      | Rotate.Right -> collide' (RowNum - 1) (tsuyo1.Pos - 1) (tsuyo1.Pos + 1) (RightCollide true) (RightCollide false) Other
+      | Rotate.Left -> collide' 0 (tsuyo1.Pos + 1) (tsuyo1.Pos - 1) (LeftCollide true) (LeftCollide false) Other
     | SndTsuyoPos.Down ->
-      collide' 0 (tsuyo2.Pos + 1) (tsuyo2.Pos - 1) (LeftCollide true) (LeftCollide false) Other
+      match rot with
+      | Rotate.Right -> collide' 0 (tsuyo2.Pos + 1) (tsuyo2.Pos - 1) (LeftCollide true) (LeftCollide false) Other
+      | Rotate.Left -> collide' (RowNum - 1) (tsuyo2.Pos - 1) (tsuyo2.Pos + 1) (RightCollide true) (RightCollide false) Other
     | _ -> Other
   
-  match pos with
-  | RightCollide false ->
+  match pos, rot with
+  | (RightCollide false), Rotate.Right ->
     tsuyo1.Pos <- tsuyo1.Pos - 1
     tsuyo2.Pos <- tsuyo2.Pos - 1
     true
-  | LeftCollide false ->
+  | (LeftCollide false), Rotate.Left ->
+    tsuyo1.Pos <- tsuyo1.Pos + 1
+    tsuyo2.Pos <- tsuyo2.Pos + 1
+    true
+  | LeftCollide false, Rotate.Right ->
     tsuyo1.Pos <- tsuyo2.Pos + 1
     true
-  | LeftCollide true | RightCollide true -> false
-  | Other -> true
+  | RightCollide false, Rotate.Left ->
+    tsuyo1.Pos <- tsuyo2.Pos - 1
+    true
+  | Other, _ -> true
+  | _ -> false
 
-let rotate' (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) f (num:int) (pos:SndTsuyoPos) =
+let rotate (tobj:TsuyoObj) f1 pos1 f2 pos2 f3 pos3 f4 pos4 rot =
+
+  let rotate' (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) f (num:int) (pos:SndTsuyoPos) =
     tsuyo2.Pos <- f tsuyo1.Pos num
     tsuyo2, pos
 
-let rotateR (tobj:TsuyoObj) =
-
   match tobj.Tsuyo2 with
   | (tsuyo2, SndTsuyoPos.Right) ->
-    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (+) RowNum SndTsuyoPos.Down
+    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f1 RowNum pos1
   | (tsuyo2, SndTsuyoPos.Left) ->
-    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (-) RowNum SndTsuyoPos.Up
+    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f2 RowNum pos2
   | (tsuyo2, pos) ->
-    match avoidance tobj.Tsuyo1 tsuyo2 pos with
+    match avoidance tobj.Tsuyo1 tsuyo2 pos rot with
     | true ->
       match pos with
-      | SndTsuyoPos.Up -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (+) 1 SndTsuyoPos.Right
-      | SndTsuyoPos.Down -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (-) 1 SndTsuyoPos.Left
+      | SndTsuyoPos.Up -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f3 1 pos3
+      | SndTsuyoPos.Down -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f4 1 pos4
       | _ -> ()
     | false -> ()
 
-let rotateL (tobj:TsuyoObj) =
-  match tobj.Tsuyo2 with
-  | (tsuyo2, SndTsuyoPos.Up) ->
-    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (-) 1 SndTsuyoPos.Left
-  | (tsuyo2, SndTsuyoPos.Left) ->
-    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (+) RowNum SndTsuyoPos.Down
-  | (tsuyo2, SndTsuyoPos.Down) ->
-    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (+) 1 SndTsuyoPos.Right
-  | (tsuyo2, SndTsuyoPos.Right) ->
-    tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 (-) RowNum SndTsuyoPos.Up
+let rotateR tobj = rotate tobj (+) SndTsuyoPos.Down (-) SndTsuyoPos.Up (+) SndTsuyoPos.Right (-) SndTsuyoPos.Left Rotate.Right
+
+let rotateL tobj = rotate tobj (-) SndTsuyoPos.Up (+) SndTsuyoPos.Down (-) SndTsuyoPos.Left (+) SndTsuyoPos.Right Rotate.Left
