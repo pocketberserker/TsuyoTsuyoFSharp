@@ -42,30 +42,23 @@ let mutable fieldTsuyo:Tsuyo list = []
 
 let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) =
 
-  let collide' f = List.exists f fieldTsuyo
+  let collide' num expr1 expr2 pattarn1 pattarn2 other = 
+    match tsuyo1.Pos % RowNum = num with 
+    | true ->
+      match List.exists (fun (x:Tsuyo) -> x.Pos = expr1) fieldTsuyo with
+      | true -> pattarn1
+      | false -> pattarn2
+    | false ->
+      match List.exists (fun (x:Tsuyo) -> x.Pos = expr2) fieldTsuyo with
+      | true -> pattarn1
+      | false -> other
 
-  let (|LeftCollide|RightCollide|Other|) =
-    function
+  let (|RightCollide|LeftCollide|Other|) (pos:SndTsuyoPos) : Choice<bool,bool,unit> =
+    match pos with
     | SndTsuyoPos.Up ->
-      match tsuyo1.Pos % RowNum = RowNum - 1 with 
-      | true ->
-        match collide' (fun (x:Tsuyo) -> x.Pos = tsuyo1.Pos - 1) with
-        | true -> RightCollide true
-        | false -> RightCollide false
-      | false ->
-        match collide' (fun (x:Tsuyo) -> x.Pos = tsuyo1.Pos + 1) with
-        | true -> RightCollide true
-        | false -> Other
+      collide' (RowNum - 1) (tsuyo1.Pos - 1) (tsuyo1.Pos + 1) (RightCollide true) (RightCollide false) Other
     | SndTsuyoPos.Down ->
-      match tsuyo1.Pos % RowNum = 0 with
-      | true ->
-        match collide' (fun (x:Tsuyo) -> x.Pos = tsuyo2.Pos + 1) with
-        | true -> LeftCollide true
-        | false -> LeftCollide false
-      | false ->
-        match collide' (fun (x:Tsuyo) -> x.Pos = tsuyo2.Pos - 1) with
-        | true -> LeftCollide true
-        | false -> Other
+      collide' 0 (tsuyo2.Pos + 1) (tsuyo2.Pos - 1) (LeftCollide true) (LeftCollide false) Other
     | _ -> Other
   
   match pos with
@@ -73,11 +66,10 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) =
     tsuyo1.Pos <- tsuyo1.Pos - 1
     tsuyo2.Pos <- tsuyo2.Pos - 1
     true
-  | RightCollide true -> false
   | LeftCollide false ->
     tsuyo1.Pos <- tsuyo2.Pos + 1
     true
-  | LeftCollide true -> false
+  | LeftCollide true | RightCollide true -> false
   | Other -> true
 
 let rotateR (tobj:TsuyoObj) =
