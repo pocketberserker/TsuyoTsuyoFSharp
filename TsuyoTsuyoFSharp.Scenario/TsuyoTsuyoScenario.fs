@@ -61,6 +61,56 @@ module 周りに障害物がない =
       |> Whereas (fst tobj.Tsuyo2).Pos
       |> It should equal (RowNum/2-1)
       |> Verify
+
+  module 第2つよを左回転 =
+
+    [<Scenario>]
+    let ``初期状態時の回転はつよが左に移動する``() =
+      let tobj = new TsuyoObj(None,None)
+
+      Given tobj
+      |> When rotateL
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Left
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum+RowNum/2-2)
+      |> Verify
+
+    [<Scenario>]
+    let ``第2つよが左にある時の回転はつよが下に移動する``() =
+      let tobj = changePos (RowNum+RowNum/2-2) SndTsuyoPos.Left
+
+      Given tobj
+      |> When rotateL
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Down
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum*2+2)
+      |> Verify
+
+    [<Scenario>]
+    let ``第2つよが下にある時の左回転はつよが右に移動する``() =
+      let tobj = changePos (RowNum*2+2) SndTsuyoPos.Down
+    
+      Given tobj
+      |> When rotateL
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Right
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum+RowNum/2)
+      |> Verify
+
+    [<Scenario>]
+    let ``第2つよが右にある時の回転はつよが最初の位置に戻る``() =
+      let tobj = changePos (RowNum+RowNum/2) SndTsuyoPos.Right
+    
+      Given tobj
+      |> When rotateL
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Up
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum/2-1)
+      |> Verify
   
 module 障害物がある =
 
