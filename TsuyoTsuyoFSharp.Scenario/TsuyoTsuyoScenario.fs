@@ -4,6 +4,12 @@ open NUnit.Framework
 open NaturalSpec
 open TsuyoTsuyo
 
+let changePos num dir =
+  let tobj = new TsuyoObj(None,None)
+  (fst tobj.Tsuyo2).Pos <- num
+  tobj.Tsuyo2 <- (fst tobj.Tsuyo2), dir
+  tobj
+
 module 周りに障害物がない =
 
   module 第2つよを右回転 =
@@ -22,9 +28,7 @@ module 周りに障害物がない =
 
     [<Scenario>]
     let ``第2つよが右にある時の右回転はつよが下に移動する``() =
-      let tobj = new TsuyoObj(None,None)
-      (fst tobj.Tsuyo2).Pos <- RowNum+RowNum/2
-      tobj.Tsuyo2 <- (fst tobj.Tsuyo2), SndTsuyoPos.Right
+      let tobj = changePos (RowNum+RowNum/2) SndTsuyoPos.Right
 
       Given tobj
       |> When rotateR
@@ -36,9 +40,7 @@ module 周りに障害物がない =
       
     [<Scenario>]
     let ``第2つよが下にある時の右回転はつよが左に移動する``() =
-      let tobj = new TsuyoObj(None,None)
-      (fst tobj.Tsuyo2).Pos <- RowNum+RowNum/2-2
-      tobj.Tsuyo2 <- (fst tobj.Tsuyo2), SndTsuyoPos.Down
+      let tobj = changePos (RowNum+RowNum/2-2) SndTsuyoPos.Down
     
       Given tobj
       |> When rotateR
@@ -50,9 +52,7 @@ module 周りに障害物がない =
 
     [<Scenario>]
     let ``第2つよが左にある時の右回転はつよが最初の位置に戻る``() =
-      let tobj = new TsuyoObj(None,None)
-      (fst tobj.Tsuyo2).Pos <- RowNum+RowNum/2-2
-      tobj.Tsuyo2 <- (fst tobj.Tsuyo2), SndTsuyoPos.Left
+      let tobj = changePos (RowNum+RowNum/2-2) SndTsuyoPos.Left
     
       Given tobj
       |> When rotateR
