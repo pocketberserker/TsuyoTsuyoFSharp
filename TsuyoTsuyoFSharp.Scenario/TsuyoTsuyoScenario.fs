@@ -215,6 +215,38 @@ module 障害物がある =
       |> It should equal (RowNum-2)
       |> Verify
 
+    [<Scenario>]
+    let ``第1つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
+      let tobj = changePos (RowNum*2-1) SndTsuyoPos.Right
+      tobj.Tsuyo1.Pos <- RowNum*2-2
+      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]
+
+      Given tobj
+      |> When rotateR
+      |> Whereas tobj.Tsuyo1.Pos
+      |> It should equal (RowNum*2-2)
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Right
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum*2-1)
+      |> Verify
+
+    [<Scenario>]
+    let ``第2つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
+      let tobj = changePos (RowNum*2-1) SndTsuyoPos.Right
+      tobj.Tsuyo1.Pos <- RowNum*2-2
+      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*3-1,TsuyoType.Dummy,false)]
+
+      Given tobj
+      |> When rotateR
+      |> Whereas tobj.Tsuyo1.Pos
+      |> It should equal (RowNum*2-2)
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Right
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum*2-1)
+      |> Verify
+
   module 第2つよを左回転 =
 
     [<Scenario>]
@@ -309,4 +341,36 @@ module 障害物がある =
       |> It should equal SndTsuyoPos.Up
       |> Whereas (fst tobj.Tsuyo2).Pos
       |> It should equal (RowNum-2)
+      |> Verify
+
+    [<Scenario>]
+    let ``第1つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
+      let tobj = changePos (RowNum) SndTsuyoPos.Left
+      tobj.Tsuyo1.Pos <- RowNum+1
+      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]
+
+      Given tobj
+      |> When rotateL
+      |> Whereas tobj.Tsuyo1.Pos
+      |> It should equal (RowNum+1)
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Left
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum)
+      |> Verify
+
+    [<Scenario>]
+    let ``第2つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
+      let tobj = changePos (RowNum) SndTsuyoPos.Left
+      tobj.Tsuyo1.Pos <- RowNum+1
+      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2,TsuyoType.Dummy,false)]
+
+      Given tobj
+      |> When rotateL
+      |> Whereas tobj.Tsuyo1.Pos
+      |> It should equal (RowNum+1)
+      |> Whereas (snd tobj.Tsuyo2)
+      |> It should equal SndTsuyoPos.Left
+      |> Whereas (fst tobj.Tsuyo2).Pos
+      |> It should equal (RowNum)
       |> Verify
