@@ -15,11 +15,13 @@ type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
 
   let mutable position = pos
 
-  let mutable hidden = hid
+  let isHidden () =
+    if position < RowNum then true
+    else false
 
   member x.Pos with get() = position and set(p) = position <- p
     
-  member x.Hidden with get() = hidden and set(h) = hidden <- h 
+  member x.Hidden = isHidden()
 
 type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
