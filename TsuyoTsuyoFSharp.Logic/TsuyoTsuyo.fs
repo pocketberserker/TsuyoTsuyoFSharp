@@ -71,38 +71,29 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
       | false -> other
 
   // trueで衝突して回転不可能、falseで衝突するが回転可能
-  let (|RightCollide|LeftCollide|BottomCollide|Other|) (pos:SndTsuyoPos) : Choice<bool,bool,unit,unit> =
-    match pos with
-    | SndTsuyoPos.Up ->
-      match rot with
-      | Rotate.Right -> collide' (RowNum - 1) (tsuyo1.Pos - 1) (tsuyo1.Pos + 1) (RightCollide true) (RightCollide false) Other
-      | Rotate.Left -> collide' 0 (tsuyo1.Pos + 1) (tsuyo1.Pos - 1) (LeftCollide true) (LeftCollide false) Other
-    | SndTsuyoPos.Down ->
-      match rot with
-      | Rotate.Right -> collide' 0 (tsuyo2.Pos + 1) (tsuyo2.Pos - 1) (LeftCollide true) (LeftCollide false) Other
-      | Rotate.Left -> collide' (RowNum - 1) (tsuyo2.Pos - 1) (tsuyo2.Pos + 1) (RightCollide true) (RightCollide false) Other
-    | SndTsuyoPos.Left ->
-      match rot with
-      | Rotate.Left -> collide'' BottomCollide Other
-      | _ -> Other
-    | SndTsuyoPos.Right ->
-      match rot with
-      | Rotate.Right -> collide'' BottomCollide Other
-      | _ -> Other
+  let (|CollideRight|CollideLeft|CollideBottom|AvoidRight|AvoidLeft|Other|) (pos:SndTsuyoPos) : Choice<unit,unit,unit,unit,unit,unit> =
+    match pos , rot with
+    | SndTsuyoPos.Up , Rotate.Right -> collide' (RowNum - 1) (tsuyo1.Pos - 1) (tsuyo1.Pos + 1) CollideRight AvoidLeft Other
+    | SndTsuyoPos.Up , Rotate.Left -> collide' 0 (tsuyo1.Pos + 1) (tsuyo1.Pos - 1) CollideLeft AvoidRight Other
+    | SndTsuyoPos.Down , Rotate.Right -> collide' 0 (tsuyo2.Pos + 1) (tsuyo2.Pos - 1) CollideLeft AvoidRight Other
+    | SndTsuyoPos.Down , Rotate.Left -> collide' (RowNum - 1) (tsuyo2.Pos - 1) (tsuyo2.Pos + 1) CollideRight AvoidLeft Other
+    | SndTsuyoPos.Left , Rotate.Left
+    | SndTsuyoPos.Right , Rotate.Right -> collide'' CollideBottom Other
+    | _ -> Other
   
   match pos, rot with
-  | (RightCollide false), Rotate.Right ->
+  | AvoidLeft, Rotate.Right ->
     tsuyo1.Pos <- tsuyo1.Pos - 1
     tsuyo2.Pos <- tsuyo2.Pos - 1
     true
-  | (LeftCollide false), Rotate.Left ->
+  | AvoidRight, Rotate.Left ->
     tsuyo1.Pos <- tsuyo1.Pos + 1
     tsuyo2.Pos <- tsuyo2.Pos + 1
     true
-  | LeftCollide false, Rotate.Right ->
+  | AvoidRight, Rotate.Right ->
     tsuyo1.Pos <- tsuyo2.Pos + 1
     true
-  | RightCollide false, Rotate.Left ->
+  | AvoidLeft, Rotate.Left ->
     tsuyo1.Pos <- tsuyo2.Pos - 1
     true
   | Other, _ -> true
