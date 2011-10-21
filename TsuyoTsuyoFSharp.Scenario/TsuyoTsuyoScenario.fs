@@ -4,372 +4,111 @@ open NUnit.Framework
 open NaturalSpec
 open TsuyoTsuyo
 
-let changePos num =
+let changePos t2pos t1pos list =
   let tobj = new TsuyoObj(None,None)
-  tobj.Tsuyo2.Pos <- num
+  tobj.Tsuyo2.Pos <- t2pos
+  tobj.Tsuyo1.Pos <- t1pos
+  match list with
+  | Some x -> TsuyoTsuyo.fieldTsuyo <- x
+  | None -> TsuyoTsuyo.fieldTsuyo <- []
   tobj
-
-[<SetUpFixture>]
-type SetUp() =
-  [<SetUp>]
-  member x.setup() = fieldTsuyo <- []
 
 module 周りに障害物がない =
 
   module 第2つよを右回転 =
 
+    let RightTestCases =
+      TestWith (tripleParam (RowNum/2-1) SndTsuyoPos.Right (RowNum+RowNum/2))
+        |> And (tripleParam (RowNum+RowNum/2) SndTsuyoPos.Down (RowNum*2+2))
+        |> And (tripleParam (RowNum*2+2) SndTsuyoPos.Left (RowNum+RowNum/2-2))
+        |> And (tripleParam (RowNum+RowNum/2-2) SndTsuyoPos.Up (RowNum/2-1))
+    
     [<Scenario>]
-    let ``初期状態時の右回転はつよが右に移動する``() =
-      let tobj = new TsuyoObj(None,None)
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Right
-      |> Whereas  tobj.Tsuyo2.Pos
-      |> It should equal (RowNum+RowNum/2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよが右にある時の右回転はつよが下に移動する``() =
-      let tobj = changePos (RowNum+RowNum/2)
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Down
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2+2)
-      |> Verify
-      
-    [<Scenario>]
-    let ``第2つよが下にある時の右回転はつよが左に移動する``() =
-      let tobj = changePos (RowNum*2+2)
+    [<ScenarioSource "RightTestCases">]
+    let ``第2つよt2pos,第1つよ初期位置時の回転結果`` t2pos result1 result2 =
+      let tobj = changePos t2pos (RowNum+RowNum/2-1) None
     
       Given tobj
       |> When rotateR
       |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Left
+      |> It should equal result1
       |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum+RowNum/2-2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよが左にある時の右回転はつよが最初の位置に戻る``() =
-      let tobj = changePos (RowNum+RowNum/2-2)
-    
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Up
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum/2-1)
+      |> It should equal result2
       |> Verify
 
   module 第2つよを左回転 =
 
-    [<Scenario>]
-    let ``初期状態時の回転はつよが左に移動する``() =
-      let tobj = new TsuyoObj(None,None)
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Left
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum+RowNum/2-2)
-      |> Verify
+    let LeftTestCases =
+      TestWith (tripleParam (RowNum/2-1) SndTsuyoPos.Left (RowNum+RowNum/2-2))
+        |> And (tripleParam (RowNum+RowNum/2-2) SndTsuyoPos.Down (RowNum*2+2))
+        |> And (tripleParam (RowNum*2+2) SndTsuyoPos.Right (RowNum+RowNum/2))
+        |> And (tripleParam (RowNum+RowNum/2) SndTsuyoPos.Up (RowNum/2-1))
 
     [<Scenario>]
-    let ``第2つよが左にある時の回転はつよが下に移動する``() =
-      let tobj = changePos (RowNum+RowNum/2-2)
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Down
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2+2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよが下にある時の左回転はつよが右に移動する``() =
-      let tobj = changePos (RowNum*2+2)
+    [<ScenarioSource "LeftTestCases">]
+    let ``第2つよt2pos,第1つよ初期位置時の回転結果`` t2pos result1 result2 =
+      let tobj = changePos t2pos (RowNum+RowNum/2-1) None
     
       Given tobj
       |> When rotateL
       |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Right
+      |> It should equal result1
       |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum+RowNum/2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよが右にある時の回転はつよが最初の位置に戻る``() =
-      let tobj = changePos (RowNum+RowNum/2)
-    
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Up
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum/2-1)
+      |> It should equal result2
       |> Verify
   
 module 障害物がある =
 
   module 第2つよを右回転 =
 
+    let RightTestCases =
+      TestWith (MultiParam [| RowNum-1; RowNum*2-1; None; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum-1; RowNum*2-1; Some [new Tsuyo(RowNum*2-2,TsuyoType.Dummy,false)]; RowNum*2-1; SndTsuyoPos.Up; RowNum-1 |])
+        |> And (MultiParam [| RowNum*3-1; RowNum*2-1; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]; RowNum*2-1; SndTsuyoPos.Down; RowNum*3-1 |])
+        |> And (MultiParam [| RowNum*2; RowNum; None; RowNum*2+1; SndTsuyoPos.Left; RowNum*2 |])
+        |> And (MultiParam [| RowNum*2; RowNum; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum; SndTsuyoPos.Down; RowNum*2 |])
+        |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-1,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
+        |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-1,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+
     [<Scenario>]
-    let ``右壁隣接時の右回転は第1つよが左に、第2つよが第1つよの右に移動する``() =
-      let tobj = changePos (RowNum-1)
-      tobj.Tsuyo1.Pos <- RowNum*2-1
+    [<ScenarioSource "RightTestCases">]
+    let ``第2つよt2pos,第1つよ位置t1pos,フィールド状態list時の右回転結果`` t2pos t1pos list result1 result2 result3 =
+      let tobj = changePos t2pos t1pos list 
 
       Given tobj
       |> When rotateR
       |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-2)
+      |> It should equal result1
       |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Right
+      |> It should equal result2
       |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2-1)
-      |> Verify
-
-    [<Scenario>]
-    let ``第1つよの右側が壁で左側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum-1)
-      tobj.Tsuyo1.Pos <- RowNum*2-1
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2-2,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-1)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Up
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum-1)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよの左側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum*3-1)
-      tobj.Tsuyo1.Pos <- RowNum*2-1
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-1)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Down
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*3-1)
-      |> Verify
-
-    [<Scenario>]
-    let ``左壁隣接時の右回転は第1つよが第2つよの右に移動し、第2つよはそのまま``() =
-      let tobj = changePos (RowNum*2)
-      tobj.Tsuyo1.Pos <- RowNum
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2+1)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Left
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよの左側が壁で右側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum*2)
-      tobj.Tsuyo1.Pos <- RowNum
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Down
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第1つよの右側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum-2)
-      tobj.Tsuyo1.Pos <- RowNum*2-2
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2-1,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-2)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Up
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum-2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第1つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum*2-1)
-      tobj.Tsuyo1.Pos <- RowNum*2-2
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-2)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Right
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2-1)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum*2-1)
-      tobj.Tsuyo1.Pos <- RowNum*2-2
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*3-1,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-2)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Right
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2-1)
+      |> It should equal result3
       |> Verify
 
   module 第2つよを左回転 =
 
+    let LeftTestCases =
+      TestWith (MultiParam [| 0; RowNum; None; RowNum+1; SndTsuyoPos.Left; RowNum |])
+        |> And (MultiParam [| 0; RowNum; Some [new Tsuyo(RowNum+1,TsuyoType.Dummy,false)]; RowNum; SndTsuyoPos.Up; 0 |])
+        |> And (MultiParam [| RowNum*2; RowNum; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum; SndTsuyoPos.Down; RowNum*2 |])
+        |> And (MultiParam [| RowNum*2-1; RowNum-1; None; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum*2-1; RowNum-1; Some [new Tsuyo(RowNum*2-2,TsuyoType.Dummy,false)]; RowNum-1; SndTsuyoPos.Down; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-RowNum/2,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
+        |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
+        |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2,TsuyoType.Dummy,false)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
+
     [<Scenario>]
-    let ``左壁隣接時の左回転は第1つよが右に、第2つよが第1つよの左に移動する``() =
-      let tobj = changePos 0
-      tobj.Tsuyo1.Pos <- RowNum
+    [<ScenarioSource "LeftTestCases">]
+    let ``第2つよt2pos,第1つよ位置t1pos,フィールド状態list時の右回転結果`` t2pos t1pos list result1 result2 result3 =
+      let tobj = changePos t2pos t1pos list 
 
       Given tobj
       |> When rotateL
       |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum+1)
+      |> It should equal result1
       |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Left
+      |> It should equal result2
       |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum)
-      |> Verify
-
-    [<Scenario>]
-    let ``第1つよの左側が壁で右側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos 0
-      tobj.Tsuyo1.Pos <- RowNum
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum+1,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Up
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal 0
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよの右側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum*2)
-      tobj.Tsuyo1.Pos <- RowNum
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Down
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2)
-      |> Verify
-
-    [<Scenario>]
-    let ``右壁隣接時の回転は第1つよが第2つよの左に移動し、第2つよはそのまま``() =
-      let tobj = changePos (RowNum*2-1)
-      tobj.Tsuyo1.Pos <- RowNum-1
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-2)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Right
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2-1)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよの右側が壁で左側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum*2-1)
-      tobj.Tsuyo1.Pos <- RowNum-1
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2-2,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum-1)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Down
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum*2-1)
-      |> Verify
-
-    [<Scenario>]
-    let ``第1つよの左側につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum-2)
-      tobj.Tsuyo1.Pos <- RowNum*2-2
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2-RowNum/2,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum*2-2)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Up
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum-2)
-      |> Verify
-
-    [<Scenario>]
-    let ``第1つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos (RowNum)
-      tobj.Tsuyo1.Pos <- RowNum+1
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum+1)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Left
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum)
-      |> Verify
-
-    [<Scenario>]
-    let ``第2つよの下につよが存在する場合、回転できずにそのままの位置を保つ``() =
-      let tobj = changePos RowNum
-      tobj.Tsuyo1.Pos <- RowNum+1
-      TsuyoTsuyo.fieldTsuyo <- [new Tsuyo(RowNum*2,TsuyoType.Dummy,false)]
-
-      Given tobj
-      |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
-      |> It should equal (RowNum+1)
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal SndTsuyoPos.Left
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal (RowNum)
+      |> It should equal result3
       |> Verify
