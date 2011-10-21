@@ -32,11 +32,19 @@ type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
   let tsuyo1 = createTsuyo status1 (RowNum+RowNum/2-1) false
   
-  let mutable tsuyo2 = createTsuyo status2 (RowNum/2-1) true , SndTsuyoPos.Up
+  let tsuyo2 = createTsuyo status2 (RowNum/2-1) true
+
+  let calcSndTsuyoPos () =
+    if  tsuyo2.Pos - tsuyo1.Pos = 1 then SndTsuyoPos.Right
+    elif tsuyo2.Pos - tsuyo1.Pos = -1 then SndTsuyoPos.Left
+    elif tsuyo2.Pos - tsuyo1.Pos = RowNum then SndTsuyoPos.Down
+    else SndTsuyoPos.Up
 
   member x.Tsuyo1 = tsuyo1
 
-  member x.Tsuyo2 with get() = tsuyo2 and set(t) = tsuyo2 <- t
+  member x.Tsuyo2 = tsuyo2
+
+  member x.Tsuyo2Pos = calcSndTsuyoPos ()
 
 let mutable fieldTsuyo:Tsuyo list = []
 
@@ -100,23 +108,17 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
   | Other, _ -> true
   | _ -> false
 
-let rotate (tobj:TsuyoObj) f1 pos1 f2 pos2 f3 pos3 f4 pos4 rot =
-
-  let rotate' (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) f (num:int) (pos:SndTsuyoPos) =
-    tsuyo2.Pos <- f tsuyo1.Pos num
-    tsuyo2, pos
-  
-  let tsuyo2 = fst tobj.Tsuyo2
-  let pos = snd tobj.Tsuyo2
-  match avoidance tobj.Tsuyo1 tsuyo2 pos rot with
+let rotate (tobj:TsuyoObj) f1 f2 f3 f4 rot =
+  let pos = tobj.Tsuyo2Pos // 障害物衝突による座標変更前の第2つよの位置
+  match avoidance tobj.Tsuyo1 tobj.Tsuyo2 pos rot with
   | true ->
     match pos with
-    | SndTsuyoPos.Right -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f1 RowNum pos1
-    | SndTsuyoPos.Left -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f2 RowNum pos2
-    | SndTsuyoPos.Up -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f3 1 pos3
-    | SndTsuyoPos.Down -> tobj.Tsuyo2 <- rotate' tobj.Tsuyo1 tsuyo2 f4 1 pos4
+    | SndTsuyoPos.Right -> tobj.Tsuyo2.Pos <- f1 tobj.Tsuyo1.Pos RowNum
+    | SndTsuyoPos.Left -> tobj.Tsuyo2.Pos <- f2 tobj.Tsuyo1.Pos RowNum
+    | SndTsuyoPos.Up -> tobj.Tsuyo2.Pos <- f3 tobj.Tsuyo1.Pos 1
+    | SndTsuyoPos.Down -> tobj.Tsuyo2.Pos <- f4 tobj.Tsuyo1.Pos 1
   | false -> ()
 
-let rotateR tobj = rotate tobj (+) SndTsuyoPos.Down (-) SndTsuyoPos.Up (+) SndTsuyoPos.Right (-) SndTsuyoPos.Left Rotate.Right
+let rotateR tobj = rotate tobj (+) (-) (+) (-) Rotate.Right
 
-let rotateL tobj = rotate tobj (-) SndTsuyoPos.Up (+) SndTsuyoPos.Down (-) SndTsuyoPos.Left (+) SndTsuyoPos.Right Rotate.Left
+let rotateL tobj = rotate tobj (-) (+) (-) (+) Rotate.Left
