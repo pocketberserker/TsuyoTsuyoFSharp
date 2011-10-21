@@ -13,6 +13,10 @@ let changePos t2pos t1pos list =
   | None -> TsuyoTsuyo.fieldTsuyo <- []
   tobj
 
+let getTsuyo1Pos (tobj:TsuyoObj) = tobj.Tsuyo1.Pos
+
+let getTsuyo2Pos (tobj:TsuyoObj) = tobj.Tsuyo2Pos, tobj.Tsuyo2.Pos
+
 module 周りに障害物がない =
 
   module 第2つよを右回転 =
@@ -78,12 +82,10 @@ module 障害物がある =
 
       Given tobj
       |> When rotateR
-      |> Whereas tobj.Tsuyo1.Pos
+      |> When getTsuyo1Pos
       |> It should equal result1
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal result2
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal result3
+      |> Whereas (getTsuyo2Pos tobj)
+      |> It should equal (result2, result3)
       |> Verify
 
   module 第2つよを左回転 =
@@ -105,10 +107,8 @@ module 障害物がある =
 
       Given tobj
       |> When rotateL
-      |> Whereas tobj.Tsuyo1.Pos
+      |> When getTsuyo1Pos
       |> It should equal result1
-      |> Whereas tobj.Tsuyo2Pos
-      |> It should equal result2
-      |> Whereas tobj.Tsuyo2.Pos
-      |> It should equal result3
+      |> Whereas (getTsuyo2Pos tobj)
+      |> It should equal (result2, result3)
       |> Verify
