@@ -102,7 +102,7 @@ module 障害物がある =
 
     [<Scenario>]
     [<ScenarioSource "LeftTestCases">]
-    let ``第2つよt2pos,第1つよ位置t1pos,フィールド状態list時の右回転結果`` t2pos t1pos list result1 result2 result3 =
+    let ``第2つよt2pos,第1つよ位置t1pos,フィールド状態list時の左回転結果`` t2pos t1pos list result1 result2 result3 =
       let tobj = changePos t2pos t1pos list 
 
       Given tobj
