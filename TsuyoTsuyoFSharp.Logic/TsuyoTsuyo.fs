@@ -17,9 +17,7 @@ type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
 
   let mutable hidden = hid
 
-  member x.Pos
-    with get() = position
-    and set(p) = position <- p
+  member x.Pos with get() = position and set(p) = position <- p
     
   member x.Hidden with get() = hidden and set(h) = hidden <- h 
 
@@ -70,7 +68,6 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
       | true -> pattarn
       | false -> other
 
-  // trueで衝突して回転不可能、falseで衝突するが回転可能
   let (|CollideRight|CollideLeft|CollideBottom|AvoidRight|AvoidLeft|Other|) (pos:SndTsuyoPos) : Choice<unit,unit,unit,unit,unit,unit> =
     match pos , rot with
     | SndTsuyoPos.Up , Rotate.Right -> collide' (RowNum - 1) (tsuyo1.Pos - 1) (tsuyo1.Pos + 1) CollideRight AvoidLeft Other
@@ -99,7 +96,7 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
   | Other, _ -> true
   | _ -> false
 
-let rotate (tobj:TsuyoObj) f1 f2 f3 f4 rot =
+let rotate f1 f2 f3 f4 rot (tobj:TsuyoObj) =
   let pos = tobj.Tsuyo2Pos // 障害物衝突による座標変更前の第2つよの位置
   if avoidance tobj.Tsuyo1 tobj.Tsuyo2 pos rot then
     match pos with
@@ -109,6 +106,6 @@ let rotate (tobj:TsuyoObj) f1 f2 f3 f4 rot =
     | SndTsuyoPos.Down -> tobj.Tsuyo2.Pos <- f4 tobj.Tsuyo1.Pos 1
   tobj
 
-let rotateR tobj = rotate tobj (+) (-) (+) (-) Rotate.Right
+let rotateR tobj = tobj |> rotate (+) (-) (+) (-) Rotate.Right
 
-let rotateL tobj = rotate tobj (-) (+) (-) (+) Rotate.Left
+let rotateL tobj = tobj |> rotate (-) (+) (-) (+) Rotate.Left
