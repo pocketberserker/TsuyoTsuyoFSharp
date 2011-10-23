@@ -40,6 +40,11 @@ type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
 
   member x.ImageStream = stream ()
 
+  member x.ScreenName = 
+    match status with
+    | TsuyoType.Real s -> s.User.ScreenName
+    | TsuyoType.Dummy -> "##dummy##"
+
 type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
   let createTsuyo status pos hidden =
