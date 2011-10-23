@@ -1,6 +1,9 @@
 ﻿module TsuyoTsuyo
 
 open Twitterizer
+open System.IO
+open System.Net
+open Microsoft.FSharp.Control.WebExtensions
 
 let RowNum = 6
 let ColmunNum = 13
@@ -19,9 +22,23 @@ type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
     if position < RowNum then true
     else false
 
+  let stream () =
+    match status with
+    | TsuyoType.Real s ->
+      async {
+        let url = s.User.ProfileImageLocation
+        let req = WebRequest.Create url
+        let! rsp = req.AsyncGetResponse()
+
+        return rsp.GetResponseStream()
+      } |> Async.RunSynchronously
+    | TsuyoType.Dummy -> File.OpenRead(@"480_16colors_normal.png") :> Stream
+
   member x.Pos with get() = position and set(p) = position <- p
     
   member x.Hidden = isHidden()
+
+  member x.ImageStream = stream ()
 
 type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
