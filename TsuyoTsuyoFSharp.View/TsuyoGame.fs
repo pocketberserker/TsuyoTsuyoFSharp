@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
+open Microsoft.Xna.Framework.Input
 open TsuyoTsuyo
 
 type TsuyoGame() as this =
@@ -21,13 +22,34 @@ type TsuyoGame() as this =
 
   let drawTsuyo (tsuyo:Tsuyo) =
     let fx,fy = tsuyo.Pos%RowNum, tsuyo.Pos/RowNum
-    let lx,ly = float32 (fx*48),float32 (fy*48)
+    let lx,ly = float32 (fx*48),float32 (fy*48-48)
     if textureSet.ContainsKey tsuyo.ScreenName then sprite.Force().Draw(textureSet.Item(tsuyo.ScreenName).Force(), Vector2(lx,ly), Color.White)
     else
       let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream)
       sprite.Force().Draw(texture.Force(), Vector2(lx,ly), Color.White)
       textureSet.Add(tsuyo.ScreenName ,texture)
       
+  let operateKeys () =
+    let operateKey =
+      function
+      | Keys.Z -> rotateL ps
+      | Keys.X -> rotateR ps
+      | Keys.Left ->
+        if ps.Tsuyo1.Pos % RowNum <> 0 && ps.Tsuyo2.Pos % RowNum <> 0 then
+          ps.Tsuyo1.Pos <- ps.Tsuyo1.Pos - 1
+          ps.Tsuyo2.Pos <- ps.Tsuyo2.Pos - 1
+        ps
+      | Keys.Right ->
+        if ps.Tsuyo1.Pos % RowNum <> RowNum - 1 && ps.Tsuyo2.Pos % RowNum <> RowNum - 1 then
+          ps.Tsuyo1.Pos <- ps.Tsuyo1.Pos + 1
+          ps.Tsuyo2.Pos <- ps.Tsuyo2.Pos + 1
+        ps
+      | _ -> ps
+      
+    Keyboard.GetState().GetPressedKeys()
+    |> Array.toList
+    |> List.map operateKey
+    |> ignore
 
   do
     this.Window.Title <- gameTitle
@@ -41,6 +63,7 @@ type TsuyoGame() as this =
     base.Initialize()
 
   override game.Update gameTime =
+    operateKeys ()
     base.Update gameTime
 
   override game.Draw gameTime =
