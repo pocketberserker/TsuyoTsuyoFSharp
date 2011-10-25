@@ -97,12 +97,14 @@ let avoidance (tobj:TsuyoObj) (pos:SndTsuyoPos) (rot:Rotate) =
       | false -> other
 
   let collide'' pattarn other =
-    match List.exists (fun (x:Tsuyo) -> x.Pos = tsuyo1.Pos + RowNum) fieldTsuyo with
-    | true -> pattarn
-    | false ->
-      match List.exists (fun (x:Tsuyo) -> x.Pos = tsuyo2.Pos + RowNum) fieldTsuyo with
+    if tsuyo1.Pos / RowNum <> ColNum - 1 && tsuyo2.Pos / RowNum <> ColNum - 1 then
+      match List.exists (fun (x:Tsuyo) -> x.Pos = tsuyo1.Pos + RowNum) fieldTsuyo with
       | true -> pattarn
-      | false -> other
+      | false ->
+        match List.exists (fun (x:Tsuyo) -> x.Pos = tsuyo2.Pos + RowNum) fieldTsuyo with
+        | true -> pattarn
+        | false -> other
+    else pattarn
 
   let (|CollideRight|CollideLeft|CollideBottom|AvoidRight|AvoidLeft|Other|) (pos:SndTsuyoPos) : Choice<unit,unit,unit,unit,unit,unit> =
     match pos , rot with

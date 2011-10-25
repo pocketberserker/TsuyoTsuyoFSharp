@@ -74,6 +74,7 @@ module 障害物がある =
         |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-1,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
         |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
         |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-1,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum*ColNum-1; RowNum*ColNum-2; None; RowNum*ColNum-2; SndTsuyoPos.Right; RowNum*ColNum-1 |])
 
     [<Scenario>]
     [<ScenarioSource "RightTestCases">]
@@ -99,6 +100,7 @@ module 障害物がある =
         |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-RowNum/2,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
         |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
         |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2,TsuyoType.Dummy,false)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
+        |> And (MultiParam [| RowNum*ColNum-2; RowNum*ColNum-1; None; RowNum*ColNum-1; SndTsuyoPos.Left; RowNum*ColNum-2 |])
 
     [<Scenario>]
     [<ScenarioSource "LeftTestCases">]
