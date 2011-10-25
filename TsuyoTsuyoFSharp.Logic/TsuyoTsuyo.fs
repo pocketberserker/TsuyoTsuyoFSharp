@@ -91,42 +91,42 @@ let isCollideWall (tobj:TsuyoObj) =
   | CollideRightWall | CollideLeftWall | CollideBottom -> true
   | Other -> false
 
+let detectCollision expr = List.exists (fun (x:Tsuyo) -> x.Pos = expr) fieldTsuyo
+
 type Rotate = | Right | Left
 let avoidance (tobj:TsuyoObj) (pos:SndTsuyoPos) (rot:Rotate) =
 
   let tsuyo1,tsuyo2 = tobj.Tsuyo1, tobj.Tsuyo2
-
-  let collideTsuyo expr = List.exists (fun (x:Tsuyo) -> x.Pos = expr) fieldTsuyo
 
   let (|Collide|AvoidRight|AvoidLeft|Other|) (pos:SndTsuyoPos) : Choice<unit,unit,unit,unit> =
     match tobj with
     | CollideBottom -> Collide
     | CollideRightWall ->
       match pos , rot with
-      | SndTsuyoPos.Up , Rotate.Right -> if collideTsuyo (tsuyo1.Pos - 1) then Collide else AvoidLeft
-      | SndTsuyoPos.Up , Rotate.Left -> if collideTsuyo (tsuyo1.Pos - 1) then Collide else Other
-      | SndTsuyoPos.Down , Rotate.Right -> if collideTsuyo (tsuyo2.Pos - 1) then Collide else Other
-      | SndTsuyoPos.Down , Rotate.Left -> if collideTsuyo (tsuyo2.Pos - 1) then Collide else AvoidLeft
+      | SndTsuyoPos.Up , Rotate.Right -> if detectCollision (tsuyo1.Pos - 1) then Collide else AvoidLeft
+      | SndTsuyoPos.Up , Rotate.Left -> if detectCollision (tsuyo1.Pos - 1) then Collide else Other
+      | SndTsuyoPos.Down , Rotate.Right -> if detectCollision (tsuyo2.Pos - 1) then Collide else Other
+      | SndTsuyoPos.Down , Rotate.Left -> if detectCollision (tsuyo2.Pos - 1) then Collide else AvoidLeft
       | SndTsuyoPos.Left , Rotate.Left
-      | SndTsuyoPos.Right , Rotate.Right -> if collideTsuyo (tsuyo1.Pos + RowNum) || collideTsuyo (tsuyo2.Pos + RowNum) then Collide else Other
+      | SndTsuyoPos.Right , Rotate.Right -> if detectCollision (tsuyo1.Pos + RowNum) || detectCollision (tsuyo2.Pos + RowNum) then Collide else Other
       | _ -> Other
     | CollideLeftWall ->
       match pos , rot with
-      | SndTsuyoPos.Up , Rotate.Right -> if collideTsuyo (tsuyo1.Pos + 1) then Collide else Other
-      | SndTsuyoPos.Up , Rotate.Left -> if collideTsuyo (tsuyo1.Pos + 1) then Collide else AvoidRight
-      | SndTsuyoPos.Down , Rotate.Right -> if collideTsuyo (tsuyo2.Pos + 1)then Collide else AvoidRight
-      | SndTsuyoPos.Down , Rotate.Left -> if collideTsuyo (tsuyo2.Pos + 1) then Collide else Other
+      | SndTsuyoPos.Up , Rotate.Right -> if detectCollision (tsuyo1.Pos + 1) then Collide else Other
+      | SndTsuyoPos.Up , Rotate.Left -> if detectCollision (tsuyo1.Pos + 1) then Collide else AvoidRight
+      | SndTsuyoPos.Down , Rotate.Right -> if detectCollision (tsuyo2.Pos + 1)then Collide else AvoidRight
+      | SndTsuyoPos.Down , Rotate.Left -> if detectCollision (tsuyo2.Pos + 1) then Collide else Other
       | SndTsuyoPos.Left , Rotate.Left
-      | SndTsuyoPos.Right , Rotate.Right -> if collideTsuyo (tsuyo1.Pos + RowNum) || collideTsuyo (tsuyo2.Pos + RowNum) then Collide else Other
+      | SndTsuyoPos.Right , Rotate.Right -> if detectCollision (tsuyo1.Pos + RowNum) || detectCollision (tsuyo2.Pos + RowNum) then Collide else Other
       | _ -> Other
     | Other ->
       match pos , rot with
-      | SndTsuyoPos.Up , Rotate.Right -> if collideTsuyo (tsuyo1.Pos + 1) then Collide else Other
-      | SndTsuyoPos.Up , Rotate.Left -> if collideTsuyo (tsuyo1.Pos - 1) then Collide else Other
-      | SndTsuyoPos.Down , Rotate.Right -> if collideTsuyo (tsuyo2.Pos - 1) then Collide else Other
-      | SndTsuyoPos.Down , Rotate.Left -> if collideTsuyo (tsuyo2.Pos + 1) then Collide else Other
+      | SndTsuyoPos.Up , Rotate.Right -> if detectCollision (tsuyo1.Pos + 1) then Collide else Other
+      | SndTsuyoPos.Up , Rotate.Left -> if detectCollision (tsuyo1.Pos - 1) then Collide else Other
+      | SndTsuyoPos.Down , Rotate.Right -> if detectCollision (tsuyo2.Pos - 1) then Collide else Other
+      | SndTsuyoPos.Down , Rotate.Left -> if detectCollision (tsuyo2.Pos + 1) then Collide else Other
       | SndTsuyoPos.Left , Rotate.Left
-      | SndTsuyoPos.Right , Rotate.Right -> if collideTsuyo (tsuyo1.Pos + RowNum) || collideTsuyo (tsuyo2.Pos + RowNum) then Collide else Other
+      | SndTsuyoPos.Right , Rotate.Right -> if detectCollision (tsuyo1.Pos + RowNum) || detectCollision (tsuyo2.Pos + RowNum) then Collide else Other
       | _ -> Other
   
   match pos, rot with

@@ -35,11 +35,15 @@ type TsuyoGame() as this =
       | Keys.Z -> rotateL ps
       | Keys.X -> rotateR ps
       | Keys.Left ->
-        if isCollideWall ps |> not then move ps Direction.Left else ps
+        ps |> function
+          | CollideLeftWall -> ps
+          | _ -> if detectCollision (ps.Tsuyo1.Pos-1) || detectCollision (ps.Tsuyo2.Pos - 1) then ps else move ps Direction.Left
       | Keys.Right ->
-        if isCollideWall ps |> not then move ps Direction.Right else ps
+        ps |> function
+          | CollideRightWall -> ps
+          | _ -> if detectCollision (ps.Tsuyo1.Pos+1) || detectCollision (ps.Tsuyo2.Pos + 1) then ps else move ps Direction.Right
       | Keys.Down ->
-        if isCollideWall ps |> not then move ps Direction.Down else ps
+        move ps Direction.Down
       | _ -> ps
       
     Keyboard.GetState().GetPressedKeys()
@@ -60,6 +64,12 @@ type TsuyoGame() as this =
 
   override game.Update gameTime =
     operateKeys ()
+    if detectCollision (ps.Tsuyo1.Pos+RowNum) || detectCollision (ps.Tsuyo2.Pos+RowNum) then
+      fieldTsuyo <- ps.Tsuyo1::ps.Tsuyo2::fieldTsuyo; ps <- new TsuyoObj(None,None)
+    else
+      ps |> function
+        | CollideBottom -> fieldTsuyo <- ps.Tsuyo1::ps.Tsuyo2::fieldTsuyo; ps <- new TsuyoObj(None,None)
+        | _ -> ()
     base.Update gameTime
 
   override game.Draw gameTime =
