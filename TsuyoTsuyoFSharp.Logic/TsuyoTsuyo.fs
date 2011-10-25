@@ -81,7 +81,9 @@ let move (tobj:TsuyoObj) direction =
   tobj
 
 type Rotate = | Right | Left
-let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
+let avoidance (tobj:TsuyoObj) (pos:SndTsuyoPos) (rot:Rotate) =
+
+  let tsuyo1,tsuyo2 = tobj.Tsuyo1, tobj.Tsuyo2
 
   let collide' num expr1 expr2 pattarn1 pattarn2 other = 
     match tsuyo1.Pos % RowNum = num with 
@@ -114,12 +116,10 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
   
   match pos, rot with
   | AvoidLeft, Rotate.Right ->
-    tsuyo1.Pos <- tsuyo1.Pos - 1
-    tsuyo2.Pos <- tsuyo2.Pos - 1
+    move tobj Direction.Left |> ignore
     true
   | AvoidRight, Rotate.Left ->
-    tsuyo1.Pos <- tsuyo1.Pos + 1
-    tsuyo2.Pos <- tsuyo2.Pos + 1
+    move tobj Direction.Right |> ignore
     true
   | AvoidRight, Rotate.Right ->
     tsuyo1.Pos <- tsuyo2.Pos + 1
@@ -132,7 +132,7 @@ let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
 
 let rotate f1 f2 f3 f4 rot (tobj:TsuyoObj) =
   let pos = tobj.Tsuyo2Pos // 障害物衝突による座標変更前の第2つよの位置
-  if avoidance tobj.Tsuyo1 tobj.Tsuyo2 pos rot then
+  if avoidance tobj pos rot then
     match pos with
     | SndTsuyoPos.Right -> tobj.Tsuyo2.Pos <- f1 tobj.Tsuyo1.Pos RowNum
     | SndTsuyoPos.Left -> tobj.Tsuyo2.Pos <- f2 tobj.Tsuyo1.Pos RowNum
