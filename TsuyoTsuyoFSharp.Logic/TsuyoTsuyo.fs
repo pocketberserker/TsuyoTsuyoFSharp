@@ -6,7 +6,7 @@ open System.Net
 open Microsoft.FSharp.Control.WebExtensions
 
 let RowNum = 6
-let ColmunNum = 13
+let ColNum = 13
 
 type TsuyoType =
   | Dummy
