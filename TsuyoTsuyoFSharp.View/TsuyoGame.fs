@@ -35,11 +35,11 @@ type TsuyoGame() as this =
       | Keys.Z -> rotateL ps
       | Keys.X -> rotateR ps
       | Keys.Left ->
-        if ps.Tsuyo1.Pos % RowNum <> 0 && ps.Tsuyo2.Pos % RowNum <> 0 then move ps Direction.Left else ps
+        if isCollideWall ps |> not then move ps Direction.Left else ps
       | Keys.Right ->
-        if ps.Tsuyo1.Pos % RowNum <> RowNum - 1 && ps.Tsuyo2.Pos % RowNum <> RowNum - 1 then move ps Direction.Right else ps
+        if isCollideWall ps |> not then move ps Direction.Right else ps
       | Keys.Down ->
-        move ps Direction.Down
+        if isCollideWall ps |> not then move ps Direction.Down else ps
       | _ -> ps
       
     Keyboard.GetState().GetPressedKeys()

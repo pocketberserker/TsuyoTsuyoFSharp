@@ -152,3 +152,26 @@ module 移動 =
    |> Whereas tobj.Tsuyo2.Pos
    |> It should equal RowNum
    |> Verify
+
+module 壁の衝突判定 =
+
+  let CollideTestCases =
+    TestWith (MultiParam [| RowNum-2; RowNum-1; None; true |])
+      |> And (MultiParam [| RowNum+1; RowNum; None; true |])
+      |> And (MultiParam [| RowNum*2-1; RowNum-1; None; true |])
+      |> And (MultiParam [| RowNum*2; RowNum; None; true |])
+      |> And (MultiParam [| RowNum*(ColNum-1)-2; RowNum*ColNum-2; None; true |])
+      |> And (MultiParam [| RowNum*ColNum-1; RowNum*ColNum-2; None; true |])
+      |> And (MultiParam [| RowNum/2-1; RowNum/2-1; None; false |])
+      |> And (MultiParam [| RowNum-2; RowNum-1; None; true |])
+      |> And (MultiParam [| RowNum-2; RowNum-1; None; true |])
+
+  [<Scenario>]
+  [<ScenarioSource "CollideTestCases">]
+  let ``つよが壁に衝突するかの結果`` t2pos t1pos list result =
+   let tobj = changePos t2pos t1pos list
+
+   Given tobj
+   |> When isCollideWall
+   |> It should equal result
+   |> Verify
