@@ -70,6 +70,16 @@ type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
 let mutable fieldTsuyo:Tsuyo list = []
 
+type Direction = | Right | Left | Down
+let move (tobj:TsuyoObj) direction =
+  (tobj.Tsuyo1, tobj.Tsuyo2)
+  ||> fun (x:Tsuyo) (y:Tsuyo) ->
+    match direction with
+      | Right -> x.Pos <- x.Pos + 1; y.Pos <- y.Pos + 1
+      | Left -> x.Pos <- x.Pos - 1; y.Pos <- y.Pos - 1
+      | Down -> x.Pos <- x.Pos + RowNum; y.Pos <- y.Pos + RowNum
+  tobj
+
 type Rotate = | Right | Left
 let avoidance (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) (pos:SndTsuyoPos) (rot:Rotate) =
 

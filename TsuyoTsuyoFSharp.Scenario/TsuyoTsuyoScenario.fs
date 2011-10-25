@@ -112,3 +112,41 @@ module 障害物がある =
       |> Whereas (getTsuyo2Pos tobj)
       |> It should equal (result2, result3)
       |> Verify
+
+module 移動 =
+
+  [<Scenario>]
+  let ``右方向なら位置を一つ右に移動する`` () =
+   let tobj = changePos 0 RowNum None
+
+   Given (tobj , Direction.Right)
+   ||> When move
+   |> When getTsuyo1Pos
+   |> It should equal (RowNum+1)
+   |> Whereas tobj.Tsuyo2.Pos
+   |> It should equal 1
+   |> Verify
+
+  [<Scenario>]
+  let ``左方向なら位置を一つ左に移動する`` () =
+   let tobj = changePos 1 (RowNum+1) None
+
+   Given (tobj , Direction.Left)
+   ||> When move
+   |> When getTsuyo1Pos
+   |> It should equal (RowNum)
+   |> Whereas tobj.Tsuyo2.Pos
+   |> It should equal 0
+   |> Verify
+
+  [<Scenario>]
+  let ``下方向なら位置を一つ下に移動する`` () =
+   let tobj = changePos 0 RowNum None
+
+   Given (tobj , Direction.Down)
+   ||> When move
+   |> When getTsuyo1Pos
+   |> It should equal (RowNum*2)
+   |> Whereas tobj.Tsuyo2.Pos
+   |> It should equal RowNum
+   |> Verify
