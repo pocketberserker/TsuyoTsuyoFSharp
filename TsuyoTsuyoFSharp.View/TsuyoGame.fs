@@ -16,7 +16,7 @@ type TsuyoGame() as this =
 
   let fps = 60.
 
-  let mutable ps = new TsuyoObj(None,None)
+  let mutable ps = createTsuyoObj twitStatusList
 
   let textureSet = new Dictionary<string,Lazy<Texture2D>>()
 
@@ -59,6 +59,7 @@ type TsuyoGame() as this =
     1. / fps |> fun sec -> this.TargetElapsedTime <- TimeSpan.FromSeconds sec
 
   override game.Initialize () =
+    start ()
     base.Initialize()
 
   override game.Update gameTime =
@@ -68,10 +69,10 @@ type TsuyoGame() as this =
         ps.Tsuyo2Pos |> function
           | SndTsuyoPos.Right | SndTsuyoPos.Left -> (x,y) |> fun (x:Tsuyo,y:Tsuyo) -> (fall x), (fall y)
           | _ -> x,y
-        |> fun (x:Tsuyo,y:Tsuyo) -> fieldTsuyo <- x::y::fieldTsuyo; ps <- new TsuyoObj(None,None)
+        |> fun (x:Tsuyo,y:Tsuyo) -> fieldTsuyo <- x::y::fieldTsuyo; ps <- createTsuyoObj twitStatusList
       else
         ps |> function
-          | CollideBottom -> fieldTsuyo <- x::y::fieldTsuyo; ps <- new TsuyoObj(None,None)
+          | CollideBottom -> fieldTsuyo <- x::y::fieldTsuyo; ps <- createTsuyoObj twitStatusList
           | _ -> ()
     base.Update gameTime
 

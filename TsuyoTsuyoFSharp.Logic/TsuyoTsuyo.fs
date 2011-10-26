@@ -162,3 +162,15 @@ let rotateL tobj = tobj |> rotate (-) (+) (-) (+) Rotate.Left
 let rec fall (tsuyo:Tsuyo) =
   if tsuyo.Pos / RowNum = ColNum - 1 || detectCollision (tsuyo.Pos+RowNum) then tsuyo
   else tsuyo.Pos <- tsuyo.Pos + RowNum; fall tsuyo
+
+let mutable twitStatusList:TwitterStatus option list = []
+
+let createTsuyoObj =
+  function
+  | [] -> new TsuyoObj(None,None)
+  | [x] -> new TsuyoObj(x,None)
+  | x::xs -> new TsuyoObj(x, xs |> List.head)
+
+let created x = twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
+
+let start () = TwitStream.start "" created

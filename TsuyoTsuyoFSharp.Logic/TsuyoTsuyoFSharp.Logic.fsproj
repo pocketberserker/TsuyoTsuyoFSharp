@@ -57,6 +57,13 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FsTwitStream\FsTwitStream.fsproj">
+      <Name>FsTwitStream</Name>
+      <Project>{5a16f404-f10c-4894-953f-4d5d2fd1548e}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	     Other similar extension points exist, see Microsoft.Common.targets.
 	<Target Name="BeforeBuild">
