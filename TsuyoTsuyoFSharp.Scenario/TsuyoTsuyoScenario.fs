@@ -217,3 +217,61 @@ module 落下 =
     |> getPos
     |> It should equal (RowNum*(ColNum-1)-1)
     |> Verify
+
+module つよオブジェクト生成 =
+
+  let createTwitterStatus name = 
+    let user = new Twitterizer.TwitterUser()
+    user.ScreenName <- name
+    let status = new Twitterizer.TwitterStatus()
+    status.User <- user
+    Some status
+
+  let getScreenNames (tobj:TsuyoObj) = tobj.Tsuyo1.ScreenName,tobj.Tsuyo2.ScreenName
+
+  [<Scenario>]
+  let ``リストにTwitterStatusオブジェクトがなければダミーを二つ格納したつよオブジェクト`` () =
+    twitStatusList <- []
+
+    Given twitStatusList
+    |> When createTsuyoObj
+    |> When getScreenNames
+    |> It should equal ("##dummy##","##dummy##")
+    |> Whereas twitStatusList
+    |> It should equal []
+    |> Verify
+
+  [<Scenario>]
+  let ``リストにTwitterStatusオブジェクトが一つあれば本物とダミーを格納したつよオブジェクト`` () =
+    twitStatusList <- [createTwitterStatus "test"]
+
+    Given twitStatusList
+    |> When createTsuyoObj
+    |> When getScreenNames
+    |> It should equal ("test","##dummy##")
+    |> Whereas twitStatusList
+    |> It should equal []
+    |> Verify
+
+  [<Scenario>]
+  let ``リストにTwitterStatusオブジェクトが2つあれば本物2つを格納したつよオブジェクト`` () =
+    twitStatusList <- [createTwitterStatus "alice";createTwitterStatus "bob"]
+
+    Given twitStatusList
+    |> When createTsuyoObj
+    |> When getScreenNames
+    |> It should equal ("alice","bob")
+    |> Whereas twitStatusList
+    |> It should equal []
+    |> Verify
+
+  [<Scenario>]
+  let ``リストにTwitterStatusオブジェクトが3つあればTwitterStatusオブジェクトが一つ残る`` () =
+    let charlie = createTwitterStatus "charlie"
+    twitStatusList <- [createTwitterStatus "alice";createTwitterStatus "bob";charlie]
+
+    Given twitStatusList
+    |> When createTsuyoObj
+    |> Whereas twitStatusList
+    |> It should equal [charlie]
+    |> Verify
