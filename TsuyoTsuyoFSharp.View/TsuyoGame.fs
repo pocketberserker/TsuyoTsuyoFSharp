@@ -48,8 +48,7 @@ type TsuyoGame() as this =
       
     Keyboard.GetState().GetPressedKeys()
     |> Array.toList
-    |> List.map operateKey
-    |> ignore
+    |> List.map operateKey |> List.head |> fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2
 
   do
     this.Window.Title <- gameTitle
@@ -64,12 +63,16 @@ type TsuyoGame() as this =
 
   override game.Update gameTime =
     operateKeys ()
-    if detectCollision (ps.Tsuyo1.Pos+RowNum) || detectCollision (ps.Tsuyo2.Pos+RowNum) then
-      fieldTsuyo <- ps.Tsuyo1::ps.Tsuyo2::fieldTsuyo; ps <- new TsuyoObj(None,None)
-    else
-      ps |> function
-        | CollideBottom -> fieldTsuyo <- ps.Tsuyo1::ps.Tsuyo2::fieldTsuyo; ps <- new TsuyoObj(None,None)
-        | _ -> ()
+    |> fun (x:Tsuyo,y:Tsuyo) ->
+      if detectCollision (x.Pos+RowNum) || detectCollision (y.Pos+RowNum) then
+        ps.Tsuyo2Pos |> function
+          | SndTsuyoPos.Right | SndTsuyoPos.Left -> (x,y) |> fun (x:Tsuyo,y:Tsuyo) -> (fall x), (fall y)
+          | _ -> x,y
+        |> fun (x:Tsuyo,y:Tsuyo) -> fieldTsuyo <- x::y::fieldTsuyo; ps <- new TsuyoObj(None,None)
+      else
+        ps |> function
+          | CollideBottom -> fieldTsuyo <- x::y::fieldTsuyo; ps <- new TsuyoObj(None,None)
+          | _ -> ()
     base.Update gameTime
 
   override game.Draw gameTime =
