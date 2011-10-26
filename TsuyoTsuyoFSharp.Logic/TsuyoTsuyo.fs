@@ -158,3 +158,7 @@ let rotate f1 f2 f3 f4 rot (tobj:TsuyoObj) =
 let rotateR tobj = tobj |> rotate (+) (-) (+) (-) Rotate.Right
 
 let rotateL tobj = tobj |> rotate (-) (+) (-) (+) Rotate.Left
+
+let rec fall (tsuyo:Tsuyo) =
+  if tsuyo.Pos / RowNum = ColNum - 1 || detectCollision (tsuyo.Pos+RowNum) then tsuyo
+  else tsuyo.Pos <- tsuyo.Pos + RowNum; fall tsuyo

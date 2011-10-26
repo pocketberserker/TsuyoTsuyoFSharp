@@ -175,3 +175,45 @@ module 壁の衝突判定 =
    |> When isCollideWall
    |> It should equal result
    |> Verify
+
+module 落下 =
+
+  let getPos (t:Tsuyo) = t.Pos
+
+  [<Scenario>]
+  let ``つよは床と接地していたら落下しない`` () =
+    Given (new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy,false))
+    |> When fall
+    |> getPos
+    |> It should equal (RowNum*ColNum-1)
+    |> Verify
+
+  [<Scenario>]
+  let ``つよは床と離れていたら床まで落下する`` () =
+    fieldTsuyo <- []
+
+    Given (new Tsuyo(RowNum*(ColNum-2)-1,TsuyoType.Dummy,false))
+    |> When fall
+    |> getPos
+    |> It should equal (RowNum*ColNum-1)
+    |> Verify
+
+  [<Scenario>]
+  let ``下のつよと隣接していたら落下しない`` () =
+    fieldTsuyo <- [new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy,false)]
+
+    Given (new Tsuyo(RowNum*(ColNum-1)-1,TsuyoType.Dummy,false))
+    |> When fall
+    |> getPos
+    |> It should equal (RowNum*(ColNum-1)-1)
+    |> Verify
+
+  [<Scenario>]
+  let ``下のつよと2マス以上離れていたらつよの一つ上まで落下`` () =
+    fieldTsuyo <- [new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy,false)]
+
+    Given (new Tsuyo(RowNum*(ColNum-3)-1,TsuyoType.Dummy,false))
+    |> When fall
+    |> getPos
+    |> It should equal (RowNum*(ColNum-1)-1)
+    |> Verify
