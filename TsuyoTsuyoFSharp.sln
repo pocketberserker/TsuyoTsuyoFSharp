@@ -9,6 +9,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TsuyoTsuyoFSharp.Logic", "T
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TsuyoTsuyoFSharp.View", "TsuyoTsuyoFSharp.View\TsuyoTsuyoFSharp.View.fsproj", "{5CA8455A-5BD9-4107-BE61-92A70C5F4186}"
 EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "TsuyoTsuyoContent", "TsuyoTsuyoContent\TsuyoTsuyoContent.contentproj", "{635113DB-99DA-4808-B7FB-8F543DE7A2D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,12 @@ Global
 		{5CA8455A-5BD9-4107-BE61-92A70C5F4186}.Release|Mixed Platforms.Build.0 = Release|x86
 		{5CA8455A-5BD9-4107-BE61-92A70C5F4186}.Release|x86.ActiveCfg = Release|x86
 		{5CA8455A-5BD9-4107-BE61-92A70C5F4186}.Release|x86.Build.0 = Release|x86
+		{635113DB-99DA-4808-B7FB-8F543DE7A2D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{635113DB-99DA-4808-B7FB-8F543DE7A2D6}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{635113DB-99DA-4808-B7FB-8F543DE7A2D6}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{635113DB-99DA-4808-B7FB-8F543DE7A2D6}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{635113DB-99DA-4808-B7FB-8F543DE7A2D6}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{635113DB-99DA-4808-B7FB-8F543DE7A2D6}.Release|x86.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

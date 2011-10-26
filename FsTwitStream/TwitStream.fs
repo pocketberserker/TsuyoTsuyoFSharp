@@ -45,28 +45,18 @@ let startMyPublicStream (stream:TwitterStream) stopped created =
   
   request.BeginGetResponse(callback, request) 
 
-let rec addTracks (opts:StreamOptions) = 
-  function
-  | x::xs -> 
-    opts.Track.Add x
-    addTracks opts xs
-  | [] -> ()
-
 let startStream token streamMode track created =
 
   settingToken token
 
   let opts = new StreamOptions()
-  opts.Track.Add track
+  if track |> String.IsNullOrEmpty |> not then opts.Track.Add track
 
   use stream = new TwitterStream(token, userAgent, opts)
-  let disconnected = ref false
   let stCreatedCallback = new StatusCreatedCallback(created)
-  let stStreamStoppedCallback = new StreamStoppedCallback (fun _ -> disconnected := true)
+  let stStreamStoppedCallback = new StreamStoppedCallback (fun _ -> ())
 
   streamMode stream stStreamStoppedCallback stCreatedCallback |> ignore
-
-  while !disconnected = false do ()
 
 let publicStream stream stopped created = startMyPublicStream stream stopped created
 

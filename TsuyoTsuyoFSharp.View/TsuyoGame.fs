@@ -13,6 +13,7 @@ type TsuyoGame() as this =
   let gameTitle = "つよつよえふしゃ～ぷ！"
   let graphicsDeviceManager = new GraphicsDeviceManager(this)
   let sprite = lazy new SpriteBatch(this.GraphicsDevice)
+  let font = lazy this.Content.Load<SpriteFont>("Font")
 
   let fps = 60.
 
@@ -51,6 +52,7 @@ type TsuyoGame() as this =
     |> List.map operateKey |> List.head |> fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2
 
   do
+    this.Content.RootDirectory <- "TsuyoTsuyoContent"
     this.Window.Title <- gameTitle
     (800,600) ||>
       fun x y ->
@@ -59,8 +61,11 @@ type TsuyoGame() as this =
     1. / fps |> fun sec -> this.TargetElapsedTime <- TimeSpan.FromSeconds sec
 
   override game.Initialize () =
-    start ()
+    graphicsDeviceManager.GraphicsProfile <- GraphicsProfile.HiDef
+    graphicsDeviceManager.ApplyChanges() 
     base.Initialize()
+
+  override game.BeginRun () = start ()
 
   override game.Update gameTime =
     operateKeys ()
@@ -79,6 +84,7 @@ type TsuyoGame() as this =
   override game.Draw gameTime =
     sprite.Force().Begin()
     ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.map drawTsuyo |> ignore
+    for key in textureSet.Keys do sprite.Force().DrawString(font.Force(),key,Vector2(300.f,300.f),Color.White)
     sprite.Force().End()
     base.Draw gameTime
 
