@@ -59,13 +59,14 @@ type TsuyoGame() as this =
         graphicsDeviceManager.PreferredBackBufferWidth <- x
         graphicsDeviceManager.PreferredBackBufferHeight <- y
     1. / fps |> fun sec -> this.TargetElapsedTime <- TimeSpan.FromSeconds sec
+    textureSet.Add("##dummy##",lazy this.Content.Load("480_16colors_normal"))
 
   override game.Initialize () =
     graphicsDeviceManager.GraphicsProfile <- GraphicsProfile.HiDef
-    graphicsDeviceManager.ApplyChanges() 
+    graphicsDeviceManager.ApplyChanges()
     base.Initialize()
 
-  override game.BeginRun () = start ()
+  override game.BeginRun () = async { start () } |> Async.Start
 
   override game.Update gameTime =
     operateKeys ()
@@ -84,11 +85,13 @@ type TsuyoGame() as this =
   override game.Draw gameTime =
     sprite.Force().Begin()
     ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.map drawTsuyo |> ignore
-    for key in textureSet.Keys do sprite.Force().DrawString(font.Force(),key,Vector2(300.f,300.f),Color.White)
+    twitStatusList |> List.filter (fun x -> x.IsSome)
+    |> List.map (fun x -> sprite.Force().DrawString(font.Force(),x.Value.User.ScreenName,Vector2(300.f,300.f),Color.White)) |> ignore
     sprite.Force().End()
     base.Draw gameTime
 
   override game.EndRun () =
+    for texture in textureSet.Values do texture.Force().Dispose()
     base.EndRun()
 
 module Program =

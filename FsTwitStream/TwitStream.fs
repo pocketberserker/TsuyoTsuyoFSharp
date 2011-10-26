@@ -58,6 +58,8 @@ let startStream token streamMode track created =
 
   streamMode stream stStreamStoppedCallback stCreatedCallback |> ignore
 
+  while true do ()
+
 let publicStream stream stopped created = startMyPublicStream stream stopped created
 
 let userStream (stream:TwitterStream) stopped created = stream.StartUserStream(null, stopped, created, null, null, null, null)

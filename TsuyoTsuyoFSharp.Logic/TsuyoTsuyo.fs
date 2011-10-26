@@ -30,7 +30,10 @@ type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
         let req = WebRequest.Create url
         let! rsp = req.AsyncGetResponse()
 
-        return rsp.GetResponseStream()
+        use stream = rsp.GetResponseStream()
+        use read = new BufferedStream(stream)
+        let! byteData = read.AsyncRead(int rsp.ContentLength)
+        return new MemoryStream(byteData) :> Stream
       } |> Async.RunSynchronously
     | TsuyoType.Dummy -> File.OpenRead(@"480_16colors_normal.png") :> Stream
 
@@ -167,9 +170,9 @@ let mutable twitStatusList:TwitterStatus option list = []
 
 let createTsuyoObj =
   function
-  | [] -> new TsuyoObj(None,None)
-  | [x] -> new TsuyoObj(x,None)
-  | x::xs -> new TsuyoObj(x, xs |> List.head)
+  | [] -> twitStatusList <- []; new TsuyoObj(None,None)
+  | [x] -> twitStatusList <- []; new TsuyoObj(x,None)
+  | x::xs -> twitStatusList <- xs |> List.tail; new TsuyoObj(x, xs |> List.head)
 
 let created x = twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
 
