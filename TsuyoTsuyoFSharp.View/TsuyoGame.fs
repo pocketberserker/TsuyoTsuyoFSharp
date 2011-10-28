@@ -49,7 +49,7 @@ type TsuyoGame() as this =
       
     Keyboard.GetState().GetPressedKeys()
     |> Array.toList
-    |> List.map operateKey |> List.head |> fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2
+    |> List.map operateKey |> function | [] -> ps.Tsuyo1,ps.Tsuyo2 | list -> list |> List.head |> (fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2)
 
   do
     this.Content.RootDirectory <- "TsuyoTsuyoContent"
