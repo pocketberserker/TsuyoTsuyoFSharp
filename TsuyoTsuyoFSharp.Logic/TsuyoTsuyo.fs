@@ -14,7 +14,7 @@ type TsuyoType =
 
 type SndTsuyoPos = | Right | Down | Left | Up
 
-type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
+type Tsuyo (pos:int, status:TsuyoType) =
 
   let mutable position = pos
 
@@ -52,8 +52,8 @@ type TsuyoObj (status1:TwitterStatus option, status2:TwitterStatus option) =
 
   let createTsuyo status pos hidden =
     match status with
-    | Some x -> new Tsuyo(pos, Real x, hidden)
-    | None -> new Tsuyo(pos, Dummy, hidden)
+    | Some x -> new Tsuyo(pos, Real x)
+    | None -> new Tsuyo(pos, Dummy)
 
   let tsuyo1 = createTsuyo status1 (RowNum+RowNum/2-1) false
   

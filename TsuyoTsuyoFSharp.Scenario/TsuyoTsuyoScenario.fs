@@ -67,13 +67,13 @@ module 障害物がある =
 
     let RightTestCases =
       TestWith (MultiParam [| RowNum-1; RowNum*2-1; None; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
-        |> And (MultiParam [| RowNum-1; RowNum*2-1; Some [new Tsuyo(RowNum*2-2,TsuyoType.Dummy,false)]; RowNum*2-1; SndTsuyoPos.Up; RowNum-1 |])
-        |> And (MultiParam [| RowNum*3-1; RowNum*2-1; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]; RowNum*2-1; SndTsuyoPos.Down; RowNum*3-1 |])
+        |> And (MultiParam [| RowNum-1; RowNum*2-1; Some [new Tsuyo(RowNum*2-2,TsuyoType.Dummy)]; RowNum*2-1; SndTsuyoPos.Up; RowNum-1 |])
+        |> And (MultiParam [| RowNum*3-1; RowNum*2-1; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy)]; RowNum*2-1; SndTsuyoPos.Down; RowNum*3-1 |])
         |> And (MultiParam [| RowNum*2; RowNum; None; RowNum*2+1; SndTsuyoPos.Left; RowNum*2 |])
-        |> And (MultiParam [| RowNum*2; RowNum; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum; SndTsuyoPos.Down; RowNum*2 |])
-        |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-1,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
-        |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
-        |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-1,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum*2; RowNum; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy)]; RowNum; SndTsuyoPos.Down; RowNum*2 |])
+        |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-1,TsuyoType.Dummy)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
+        |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-2,TsuyoType.Dummy)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum*2-1; RowNum*2-2; Some [new Tsuyo(RowNum*3-1,TsuyoType.Dummy)]; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
         |> And (MultiParam [| RowNum*ColNum-1; RowNum*ColNum-2; None; RowNum*ColNum-2; SndTsuyoPos.Right; RowNum*ColNum-1 |])
 
     [<Scenario>]
@@ -93,13 +93,13 @@ module 障害物がある =
 
     let LeftTestCases =
       TestWith (MultiParam [| 0; RowNum; None; RowNum+1; SndTsuyoPos.Left; RowNum |])
-        |> And (MultiParam [| 0; RowNum; Some [new Tsuyo(RowNum+1,TsuyoType.Dummy,false)]; RowNum; SndTsuyoPos.Up; 0 |])
-        |> And (MultiParam [| RowNum*2; RowNum; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum; SndTsuyoPos.Down; RowNum*2 |])
+        |> And (MultiParam [| 0; RowNum; Some [new Tsuyo(RowNum+1,TsuyoType.Dummy)]; RowNum; SndTsuyoPos.Up; 0 |])
+        |> And (MultiParam [| RowNum*2; RowNum; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy)]; RowNum; SndTsuyoPos.Down; RowNum*2 |])
         |> And (MultiParam [| RowNum*2-1; RowNum-1; None; RowNum*2-2; SndTsuyoPos.Right; RowNum*2-1 |])
-        |> And (MultiParam [| RowNum*2-1; RowNum-1; Some [new Tsuyo(RowNum*2-2,TsuyoType.Dummy,false)]; RowNum-1; SndTsuyoPos.Down; RowNum*2-1 |])
-        |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-RowNum/2,TsuyoType.Dummy,false)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
-        |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy,false)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
-        |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2,TsuyoType.Dummy,false)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
+        |> And (MultiParam [| RowNum*2-1; RowNum-1; Some [new Tsuyo(RowNum*2-2,TsuyoType.Dummy)]; RowNum-1; SndTsuyoPos.Down; RowNum*2-1 |])
+        |> And (MultiParam [| RowNum-2; RowNum*2-2; Some [new Tsuyo(RowNum*2-RowNum/2,TsuyoType.Dummy)]; RowNum*2-2; SndTsuyoPos.Up; RowNum-2 |])
+        |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2+1,TsuyoType.Dummy)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
+        |> And (MultiParam [| RowNum; RowNum+1; Some [new Tsuyo(RowNum*2,TsuyoType.Dummy)]; RowNum+1; SndTsuyoPos.Left; RowNum |])
         |> And (MultiParam [| RowNum*ColNum-2; RowNum*ColNum-1; None; RowNum*ColNum-1; SndTsuyoPos.Left; RowNum*ColNum-2 |])
 
     [<Scenario>]
@@ -182,7 +182,7 @@ module 落下 =
 
   [<Scenario>]
   let ``つよは床と接地していたら落下しない`` () =
-    Given (new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy,false))
+    Given (new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy))
     |> When fall
     |> getPos
     |> It should equal (RowNum*ColNum-1)
@@ -192,7 +192,7 @@ module 落下 =
   let ``つよは床と離れていたら床まで落下する`` () =
     fieldTsuyo <- []
 
-    Given (new Tsuyo(RowNum*(ColNum-2)-1,TsuyoType.Dummy,false))
+    Given (new Tsuyo(RowNum*(ColNum-2)-1,TsuyoType.Dummy))
     |> When fall
     |> getPos
     |> It should equal (RowNum*ColNum-1)
@@ -200,9 +200,9 @@ module 落下 =
 
   [<Scenario>]
   let ``下のつよと隣接していたら落下しない`` () =
-    fieldTsuyo <- [new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy,false)]
+    fieldTsuyo <- [new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy)]
 
-    Given (new Tsuyo(RowNum*(ColNum-1)-1,TsuyoType.Dummy,false))
+    Given (new Tsuyo(RowNum*(ColNum-1)-1,TsuyoType.Dummy))
     |> When fall
     |> getPos
     |> It should equal (RowNum*(ColNum-1)-1)
@@ -210,9 +210,9 @@ module 落下 =
 
   [<Scenario>]
   let ``下のつよと2マス以上離れていたらつよの一つ上まで落下`` () =
-    fieldTsuyo <- [new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy,false)]
+    fieldTsuyo <- [new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy)]
 
-    Given (new Tsuyo(RowNum*(ColNum-3)-1,TsuyoType.Dummy,false))
+    Given (new Tsuyo(RowNum*(ColNum-3)-1,TsuyoType.Dummy))
     |> When fall
     |> getPos
     |> It should equal (RowNum*(ColNum-1)-1)
