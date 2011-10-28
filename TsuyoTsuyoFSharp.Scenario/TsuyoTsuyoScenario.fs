@@ -275,3 +275,82 @@ module つよオブジェクト生成 =
     |> Whereas twitStatusList
     |> It should equal [charlie]
     |> Verify
+
+module 連結つよ取得 =
+
+  [<Scenario>]
+  let ``同じscreennameのつよが存在しないなら連結は空である``() =
+    fieldTsuyo <- []
+
+    Given ("##dummy##",0)
+    ||> When getUnion
+    |> It should equal []
+    |> Verify
+
+  [<Scenario>]
+  let ``同じscreennameつよ周りにがあるなら連結は周りにあるつよのリスト``() =
+    let tsuyo1 = new Tsuyo(RowNum+2,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(RowNum*2+1,TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(RowNum,TsuyoType.Dummy)
+    let tsuyo4 = new Tsuyo(1,TsuyoType.Dummy)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3; tsuyo4]
+
+    Given ("##dummy##",RowNum+1)
+    ||> When getUnion
+    |> It should contain tsuyo1
+    |> It should contain tsuyo2
+    |> It should contain tsuyo3
+    |> It should contain tsuyo4
+    |> It should have (length 4)
+    |> Verify
+
+  [<Scenario>]
+  let ``連結していると判定されたつよの周りに同じscreennameつよが存在すればそのつよも連結結果にいれる``() =
+    let tsuyo1 = new Tsuyo(RowNum+2,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(RowNum*2+1,TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(RowNum+3,TsuyoType.Dummy)
+    let tsuyo4 = new Tsuyo(RowNum*2+2,TsuyoType.Dummy)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3; tsuyo4]
+
+    Given ("##dummy##",RowNum+1)
+    ||> When getUnion
+    |> It should contain tsuyo1
+    |> It should contain tsuyo2
+    |> It should contain tsuyo3
+    |> It should contain tsuyo4
+    |> It should have (length 4)
+    |> Verify
+
+
+  [<Scenario>]
+  let ``連結していないつよはリストに含まれない``() =
+    let tsuyo1 = new Tsuyo(RowNum+2,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(RowNum*4,TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(RowNum+3,TsuyoType.Dummy)
+    let tsuyo4 = new Tsuyo(0,TsuyoType.Dummy)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3; tsuyo4]
+
+    Given ("##dummy##",RowNum+1)
+    ||> When getUnion
+    |> It shouldn't contain tsuyo2
+    |> It shouldn't contain tsuyo4
+    |> It should have (length 2)
+    |> Verify
+
+  [<Scenario>]
+  let ``screemnameの違うつよはつよはリストに含まれない``() =
+    let tsuyo1 = new Tsuyo(RowNum+2,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(RowNum+3,TsuyoType.Dummy)
+    let user = new Twitterizer.TwitterUser()
+    user.ScreenName <- "testname"
+    let status = new Twitterizer.TwitterStatus()
+    status.User <- user
+    let tsuyo3 = new Tsuyo(RowNum+4,TsuyoType.Real status)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3]
+
+    Given ("##dummy##",RowNum+1)
+    ||> When getUnion
+    |> It should contain tsuyo1
+    |> It should contain tsuyo2
+    |> It should have (length 2)
+    |> Verify

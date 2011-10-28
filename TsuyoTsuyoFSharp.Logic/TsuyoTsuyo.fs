@@ -177,3 +177,19 @@ let createTsuyoObj =
 let created x = twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
 
 let start () = TwitStream.start "" created
+
+let getUnion name pos =
+
+  let rec getSetList result list =
+    match list with
+    | [] -> result
+    | x::xs -> getSetList (x::result) (xs |> List.filter (fun y -> x <> y))
+
+  let rec getUnion' n p result = 
+    let union =
+      fieldTsuyo |> List.filter (fun (t:Tsuyo) -> (t.Pos - 1 = p || t.Pos - RowNum = p || t.Pos + 1 = p || t.Pos + RowNum = p) && t.ScreenName = n)
+    match union |> List.filter (fun x -> result |> List.forall (fun (y:Tsuyo) -> x.Pos <> y.Pos)) with
+    | [] -> result |> getSetList []
+    | u -> u |> List.map (fun t -> getUnion' t.ScreenName t.Pos (u |> List.append result)) |> List.concat |> getSetList [];
+
+  getUnion' name pos []
