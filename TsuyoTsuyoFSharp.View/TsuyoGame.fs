@@ -26,7 +26,8 @@ type TsuyoGame() as this =
     let lx,ly = float32 (fx*48),float32 (fy*48-48)
     if textureSet.ContainsKey tsuyo.ScreenName then sprite.Force().Draw(textureSet.Item(tsuyo.ScreenName).Force(), Vector2(lx,ly), Color.White)
     else
-      let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream)
+      // tsuyo.ImageStreamがSomeの場合しかこのstatementに到達しないので、Option.ValueでStreamを取得している
+      let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream.Value)
       sprite.Force().Draw(texture.Force(), Vector2(lx,ly), Color.White)
       textureSet.Add(tsuyo.ScreenName ,texture)
       

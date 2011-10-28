@@ -34,8 +34,8 @@ type Tsuyo (pos:int, status:TsuyoType, hid:bool) =
         use read = new BufferedStream(stream)
         let! byteData = read.AsyncRead(int rsp.ContentLength)
         return new MemoryStream(byteData) :> Stream
-      } |> Async.RunSynchronously
-    | TsuyoType.Dummy -> File.OpenRead(@"480_16colors_normal.png") :> Stream
+      } |> Async.RunSynchronously |> Some
+    | TsuyoType.Dummy -> None
 
   member x.Pos with get() = position and set(p) = position <- p
     
