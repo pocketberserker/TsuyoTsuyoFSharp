@@ -76,10 +76,22 @@ type TsuyoGame() as this =
         ps.Tsuyo2Pos |> function
           | SndTsuyoPos.Right | SndTsuyoPos.Left -> (x,y) |> fun (x:Tsuyo,y:Tsuyo) -> (fall x), (fall y)
           | _ -> x,y
-        |> fun (x:Tsuyo,y:Tsuyo) -> fieldTsuyo <- x::y::fieldTsuyo; ps <- createTsuyoObj twitStatusList
+        |> fun (x:Tsuyo,y:Tsuyo) ->
+          fieldTsuyo <- x::y::fieldTsuyo
+          let xunion,yunion = getUnion x.ScreenName x.Pos, getUnion y.ScreenName y.Pos
+          if List.length xunion >= EraseNum && List.length yunion >= EraseNum then xunion |> List.append yunion |> erase |> fun list -> fieldTsuyo <- list
+          elif List.length xunion >= EraseNum then xunion |> erase |> fun list -> fieldTsuyo <- list
+          elif List.length yunion >= EraseNum then xunion |> erase |> fun list -> fieldTsuyo <- list
+          ps <- createTsuyoObj twitStatusList
       else
         ps |> function
-          | CollideBottom -> fieldTsuyo <- x::y::fieldTsuyo; ps <- createTsuyoObj twitStatusList
+          | CollideBottom ->
+            fieldTsuyo <- x::y::fieldTsuyo
+            let xunion,yunion = getUnion x.ScreenName x.Pos, getUnion y.ScreenName y.Pos
+            if List.length xunion >= EraseNum && List.length yunion >= EraseNum then xunion |> List.append yunion |> erase |> fun list -> fieldTsuyo <- list
+            elif List.length xunion >= EraseNum then xunion |> erase |> fun list -> fieldTsuyo <- list
+            elif List.length yunion >= EraseNum then xunion |> erase |> fun list -> fieldTsuyo <- list
+            ps <- createTsuyoObj twitStatusList
           | _ -> ()
     base.Update gameTime
 
