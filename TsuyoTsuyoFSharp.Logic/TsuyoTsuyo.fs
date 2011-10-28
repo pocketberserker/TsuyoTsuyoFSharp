@@ -8,6 +8,8 @@ open Microsoft.FSharp.Control.WebExtensions
 let RowNum = 6
 let ColNum = 13
 
+let EraseNum = 4
+
 type TsuyoType =
   | Dummy
   | Real of TwitterStatus
@@ -193,3 +195,7 @@ let getUnion name pos =
     | u -> u |> List.map (fun t -> getUnion' t.ScreenName t.Pos (u |> List.append result)) |> List.concat |> getSetList [];
 
   getUnion' name pos []
+
+let erase (list:Tsuyo list) =
+  if List.length list < EraseNum then fieldTsuyo
+  else list |> List.fold (fun result x -> result |> List.filter (fun y -> x <> y)) fieldTsuyo

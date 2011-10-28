@@ -354,3 +354,54 @@ module 連結つよ取得 =
     |> It should contain tsuyo2
     |> It should have (length 2)
     |> Verify
+
+module 消去 =
+
+  [<Scenario>]
+  let ``連結が3個以下ならフィールドから削除しない``() =
+    let tsuyo1 = new Tsuyo(1,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(2,TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(3,TsuyoType.Dummy)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3]
+
+    Given ("##dummy##",0)
+    ||> When getUnion
+    |> When erase
+    |> It should contain tsuyo1
+    |> It should contain tsuyo2
+    |> It should contain tsuyo3
+    |> It should have (length 3)
+    |> Verify
+
+  [<Scenario>]
+  let ``連結が4個以上ならフィールドから削除する``() =
+    let tsuyo1 = new Tsuyo(1,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(2,TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(3,TsuyoType.Dummy)
+    let tsuyo4 = new Tsuyo(4,TsuyoType.Dummy)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3; tsuyo4]
+
+    Given ("##dummy##",0)
+    ||> When getUnion
+    |> When erase
+    |> It should equal []
+    |> Verify
+
+  [<Scenario>]
+  let ``screemnameの違うつよは消えずにフィールドに残る``() =
+    let tsuyo1 = new Tsuyo(1,TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(2,TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(3,TsuyoType.Dummy)
+    let tsuyo4 = new Tsuyo(4,TsuyoType.Dummy)
+    let user = new Twitterizer.TwitterUser()
+    user.ScreenName <- "testname"
+    let status = new Twitterizer.TwitterStatus()
+    status.User <- user
+    let tsuyo5 = new Tsuyo(4,TsuyoType.Real status)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3; tsuyo4; tsuyo5]
+
+    Given ("##dummy##",RowNum+1)
+    ||> When getUnion
+    |> When erase
+    |> It should equal [tsuyo5]
+    |> Verify
