@@ -85,7 +85,7 @@ type TsuyoGame() as this =
 
   override game.Draw gameTime =
     sprite.Force().Begin()
-    ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.map drawTsuyo |> ignore
+    ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.filter (fun (x:Tsuyo) -> x.Hidden |> not) |> List.map drawTsuyo |> ignore
     twitStatusList |> List.filter (fun x -> x.IsSome)
     |> List.map (fun x -> sprite.Force().DrawString(font.Force(),x.Value.User.ScreenName,Vector2(300.f,300.f),Color.White)) |> ignore
     sprite.Force().End()
