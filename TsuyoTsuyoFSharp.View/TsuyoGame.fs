@@ -11,6 +11,7 @@ type TsuyoGame() as this =
   inherit Game()
 
   let gameTitle = "つよつよえふしゃ～ぷ！"
+  let tsuyoWidth,tsuyoHeight = 48,48
   let graphicsDeviceManager = new GraphicsDeviceManager(this)
   let sprite = lazy new SpriteBatch(this.GraphicsDevice)
   let font = lazy this.Content.Load<SpriteFont>("Font")
@@ -22,13 +23,12 @@ type TsuyoGame() as this =
   let textureSet = new Dictionary<string,Lazy<Texture2D>>()
 
   let drawTsuyo (tsuyo:Tsuyo) =
-    let fx,fy = tsuyo.Pos%RowNum, tsuyo.Pos/RowNum
-    let lx,ly = float32 (fx*48),float32 (fy*48-48)
-    if textureSet.ContainsKey tsuyo.ScreenName then sprite.Force().Draw(textureSet.Item(tsuyo.ScreenName).Force(), Vector2(lx,ly), Color.White)
+    let fx,fy = float32 (tsuyo.Pos%RowNum*tsuyoWidth), float32 (tsuyo.Pos/RowNum*tsuyoHeight)
+    if textureSet.ContainsKey tsuyo.ScreenName then sprite.Force().Draw(textureSet.Item(tsuyo.ScreenName).Force(), Vector2(fx,fy), Color.White)
     else
       // tsuyo.ImageStreamがSomeの場合しかこのstatementに到達しないので、Option.ValueでStreamを取得している
       let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream.Value)
-      sprite.Force().Draw(texture.Force(), Vector2(lx,ly), Color.White)
+      sprite.Force().Draw(texture.Force(), Vector2(fx,fy), Color.White)
       textureSet.Add(tsuyo.ScreenName ,texture)
       
   let operateKeys () =
