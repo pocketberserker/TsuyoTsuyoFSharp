@@ -1,7 +1,6 @@
 ﻿module TsuyoGame
 
 open System
-open System.Collections.Generic
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
@@ -20,16 +19,17 @@ type TsuyoGame() as this =
 
   let mutable ps = createTsuyoObj twitStatusList
 
-  let textureSet = new Dictionary<string,Lazy<Texture2D>>()
+  let mutable textures:(string * Lazy<Texture2D>) list = ["##dummy##",lazy this.Content.Load("480_16colors_normal")]
 
   let drawTsuyo (tsuyo:Tsuyo) =
     let fx,fy = float32 (tsuyo.Pos%RowNum*tsuyoWidth), float32 (tsuyo.Pos/RowNum*tsuyoHeight)
-    if textureSet.ContainsKey tsuyo.ScreenName then sprite.Force().Draw(textureSet.Item(tsuyo.ScreenName).Force(), Vector2(fx,fy), Color.White)
-    else
-      // tsuyo.ImageStreamがSomeの場合しかこのstatementに到達しないので、Option.ValueでStreamを取得している
-      let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream.Value)
-      sprite.Force().Draw(texture.Force(), Vector2(fx,fy), Color.White)
-      textureSet.Add(tsuyo.ScreenName ,texture)
+    textures |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None) |> function
+      | Some (k,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White)
+      | None -> 
+        // tsuyo.ImageStreamがSomeの場合しかこのstatementに到達しないので、Option.ValueでStreamを取得している
+        let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream.Value)
+        sprite.Force().Draw(texture.Force(), Vector2(fx,fy), Color.White)
+        textures <- (tsuyo.ScreenName ,texture)::textures
       
   let operateKeys () =
     let operateKey =
@@ -60,7 +60,6 @@ type TsuyoGame() as this =
         graphicsDeviceManager.PreferredBackBufferWidth <- x
         graphicsDeviceManager.PreferredBackBufferHeight <- y
     1. / fps |> fun sec -> this.TargetElapsedTime <- TimeSpan.FromSeconds sec
-    textureSet.Add("##dummy##",lazy this.Content.Load("480_16colors_normal"))
 
   override game.Initialize () =
     graphicsDeviceManager.GraphicsProfile <- GraphicsProfile.HiDef
@@ -104,7 +103,7 @@ type TsuyoGame() as this =
     base.Draw gameTime
 
   override game.EndRun () =
-    for texture in textureSet.Values do texture.Force().Dispose()
+    textures |> List.iter (fun (_,v) -> v.Force().Dispose())
     base.EndRun()
 
 module Program =
