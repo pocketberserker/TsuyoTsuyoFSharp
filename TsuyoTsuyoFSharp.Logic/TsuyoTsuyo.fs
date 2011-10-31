@@ -189,7 +189,9 @@ let getUnion name pos =
 
   let rec getUnion' n p result = 
     let union =
-      fieldTsuyo |> List.filter (fun (t:Tsuyo) -> (t.Pos - 1 = p || t.Pos - RowNum = p || t.Pos + 1 = p || t.Pos + RowNum = p) && t.ScreenName = n)
+      fieldTsuyo
+      |> List.filter (fun t ->
+        ((t.Pos = p + 1 && t.Pos % RowNum <> 0) || t.Pos = p + RowNum || (t.Pos = p - 1 && t.Pos % RowNum <> RowNum - 1) || t.Pos = p - RowNum) && t.ScreenName = n)
     match union |> List.filter (fun x -> result |> List.forall (fun (y:Tsuyo) -> x.Pos <> y.Pos)) with
     | [] -> result |> getSetList []
     | u -> u |> List.map (fun t -> getUnion' t.ScreenName t.Pos (u |> List.append result)) |> List.concat |> getSetList [];

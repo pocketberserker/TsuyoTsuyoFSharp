@@ -324,17 +324,15 @@ module 連結つよ取得 =
 
   [<Scenario>]
   let ``連結していないつよはリストに含まれない``() =
-    let tsuyo1 = new Tsuyo(RowNum+2,TsuyoType.Dummy)
-    let tsuyo2 = new Tsuyo(RowNum*4,TsuyoType.Dummy)
-    let tsuyo3 = new Tsuyo(RowNum+3,TsuyoType.Dummy)
-    let tsuyo4 = new Tsuyo(0,TsuyoType.Dummy)
-    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3; tsuyo4]
+    let tsuyo1 = new Tsuyo(RowNum*(ColNum-1),TsuyoType.Dummy)
+    let tsuyo2 = new Tsuyo(RowNum*(ColNum-2),TsuyoType.Dummy)
+    let tsuyo3 = new Tsuyo(RowNum*ColNum-1,TsuyoType.Dummy)
+    fieldTsuyo <- [tsuyo1; tsuyo2; tsuyo3]
 
-    Given ("##dummy##",RowNum+1)
+    Given ("##dummy##",RowNum*(ColNum-1)-1)
     ||> When getUnion
-    |> It shouldn't contain tsuyo2
-    |> It shouldn't contain tsuyo4
-    |> It should have (length 2)
+    |> It should equal [tsuyo3]
+    |> It should have (length 1)
     |> Verify
 
   [<Scenario>]
