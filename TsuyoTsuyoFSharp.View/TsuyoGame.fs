@@ -52,6 +52,17 @@ type TsuyoGame() as this =
     |> Array.toList
     |> List.map operateKey |> function | [] -> ps.Tsuyo1,ps.Tsuyo2 | list -> list |> List.head |> (fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2)
 
+  let update (fst:Tsuyo) (snd:Tsuyo) =
+    if detectCollision (fst.Pos+RowNum) || detectCollision (snd.Pos+RowNum) then
+      ps.Tsuyo2Pos |> function
+        | SndTsuyoPos.Right | SndTsuyoPos.Left -> (fst,snd) ||> fun x y -> (fall x), (fall y)
+        | _ -> fst,snd
+      |> fun (x,y) -> [x;y] |> List.iter erase; ps <- createTsuyoObj twitStatusList
+    else
+      ps |> function
+        | CollideBottom -> [fst;snd] |> List.iter erase; ps <- createTsuyoObj twitStatusList
+        | _ -> ()
+
   do
     this.Content.RootDirectory <- "TsuyoTsuyoContent"
     this.Window.Title <- gameTitle
@@ -69,17 +80,7 @@ type TsuyoGame() as this =
   override game.BeginRun () = async { start () } |> Async.Start
 
   override game.Update gameTime =
-    operateKeys ()
-    |> fun (x:Tsuyo,y:Tsuyo) ->
-      if detectCollision (x.Pos+RowNum) || detectCollision (y.Pos+RowNum) then
-        ps.Tsuyo2Pos |> function
-          | SndTsuyoPos.Right | SndTsuyoPos.Left -> (x,y) ||> fun x y -> (fall x), (fall y)
-          | _ -> x,y
-        |> fun (x,y) -> [x;y] |> List.iter erase; ps <- createTsuyoObj twitStatusList
-      else
-        ps |> function
-          | CollideBottom -> [x;y] |> List.iter erase; ps <- createTsuyoObj twitStatusList
-          | _ -> ()
+    operateKeys () ||> update
     base.Update gameTime
 
   override game.Draw gameTime =
