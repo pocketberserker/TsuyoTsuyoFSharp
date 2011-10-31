@@ -52,11 +52,6 @@ type TsuyoGame() as this =
     |> Array.toList
     |> List.map operateKey |> function | [] -> ps.Tsuyo1,ps.Tsuyo2 | list -> list |> List.head |> (fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2)
 
-  let eraseTsuyo (tsuyo:Tsuyo) =
-    fieldTsuyo <- tsuyo::fieldTsuyo
-    let union = getUnion tsuyo.ScreenName tsuyo.Pos
-    if List.length union >= EraseNum then union |> erase |> fun list -> fieldTsuyo <- list 
-
   do
     this.Content.RootDirectory <- "TsuyoTsuyoContent"
     this.Window.Title <- gameTitle
@@ -80,10 +75,10 @@ type TsuyoGame() as this =
         ps.Tsuyo2Pos |> function
           | SndTsuyoPos.Right | SndTsuyoPos.Left -> (x,y) ||> fun x y -> (fall x), (fall y)
           | _ -> x,y
-        |> fun (x,y) -> [x;y] |> List.iter eraseTsuyo; ps <- createTsuyoObj twitStatusList
+        |> fun (x,y) -> [x;y] |> List.iter erase; ps <- createTsuyoObj twitStatusList
       else
         ps |> function
-          | CollideBottom -> [x;y] |> List.iter eraseTsuyo; ps <- createTsuyoObj twitStatusList
+          | CollideBottom -> [x;y] |> List.iter erase; ps <- createTsuyoObj twitStatusList
           | _ -> ()
     base.Update gameTime
 

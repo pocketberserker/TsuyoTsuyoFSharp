@@ -198,6 +198,11 @@ let getUnion name pos =
 
   getUnion' name pos []
 
-let erase (list:Tsuyo list) =
+let getEraseList (list:Tsuyo list) =
   if List.length list < EraseNum then fieldTsuyo
   else list |> List.fold (fun result x -> result |> List.filter (fun y -> x <> y)) fieldTsuyo
+
+let erase (tsuyo:Tsuyo) =
+  fieldTsuyo <- tsuyo::fieldTsuyo
+  let union = getUnion tsuyo.ScreenName tsuyo.Pos
+  if List.length union >= EraseNum then union |> getEraseList |> fun list -> fieldTsuyo <- list 
