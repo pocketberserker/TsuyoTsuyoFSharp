@@ -19,17 +19,13 @@ type TsuyoGame() as this =
 
   let mutable ps = createTsuyoObj twitStatusList
 
-  let mutable textures:(string * Lazy<Texture2D>) list = ["##dummy##",lazy this.Content.Load("480_16colors_normal")]
+  let mutable textures:(string * Lazy<Texture2D>) list = ["##dummy##",lazy this.Content.Load<Texture2D>("480_16colors_normal")]
 
   let drawTsuyo (tsuyo:Tsuyo) =
     let fx,fy = float32 (tsuyo.Pos%RowNum*tsuyoWidth), float32 (tsuyo.Pos/RowNum*tsuyoHeight)
-    textures |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None) |> function
-      | Some (k,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White)
-      | None -> 
-        // tsuyo.ImageStreamがSomeの場合しかこのstatementに到達しないので、Option.ValueでStreamを取得している
-        let texture = lazy Texture2D.FromStream(this.GraphicsDevice, tsuyo.ImageStream.Value)
-        sprite.Force().Draw(texture.Force(), Vector2(fx,fy), Color.White)
-        textures <- (tsuyo.ScreenName ,texture)::textures
+    textures
+    |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None)
+    |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White))
       
   let operateKeys () =
     let operateKey =
@@ -53,15 +49,25 @@ type TsuyoGame() as this =
     |> List.map operateKey |> function | [] -> ps.Tsuyo1,ps.Tsuyo2 | list -> list |> List.head |> (fun (x:TsuyoObj) -> x.Tsuyo1,x.Tsuyo2)
 
   let update (fst:Tsuyo) (snd:Tsuyo) =
+
+    let asyncLoadContent (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) =
+      async {
+        [tsuyo1;tsuyo2]
+        |> List.iter (fun x ->
+          if textures |> List.exists (fun (k,v) -> k = x.ScreenName) |> not then
+            let texture = lazy Texture2D.FromStream(this.GraphicsDevice, x.ImageStream.Value) in textures <- (x.ScreenName ,texture)::textures)
+      } |> Async.Start
+
     if detectCollision (fst.Pos+RowNum) || detectCollision (snd.Pos+RowNum) then
       ps.Tsuyo2Pos |> function
         | SndTsuyoPos.Right | SndTsuyoPos.Left -> (fst,snd) ||> fun x y -> (fall x), (fall y)
         | _ -> fst,snd
-      |> fun (x,y) -> [x;y] |> List.iter erase; ps <- createTsuyoObj twitStatusList
+      |> fun (x,y) -> ps <- createTsuyoObj twitStatusList; asyncLoadContent ps.Tsuyo1 ps.Tsuyo2; [x;y] |> List.iter erase
     else
       ps |> function
-        | CollideBottom -> [fst;snd] |> List.iter erase; ps <- createTsuyoObj twitStatusList
+        | CollideBottom -> ps <- createTsuyoObj twitStatusList; asyncLoadContent ps.Tsuyo1 ps.Tsuyo2; [fst;snd] |> List.iter erase
         | _ -> ()
+    
 
   do
     this.Content.RootDirectory <- "TsuyoTsuyoContent"
