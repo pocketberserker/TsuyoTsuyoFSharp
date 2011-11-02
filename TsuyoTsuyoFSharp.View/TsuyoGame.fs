@@ -10,7 +10,9 @@ type TsuyoGame() as this =
   inherit Game()
 
   let gameTitle = "つよつよえふしゃ～ぷ！"
+  let frameWidth,frameHeight= 800,700
   let tsuyoWidth,tsuyoHeight = 48,48
+  let initPointX,initPointY = frameWidth/4,frameHeight/7
   let graphicsDeviceManager = new GraphicsDeviceManager(this)
   let sprite = lazy new SpriteBatch(this.GraphicsDevice)
   let font = lazy this.Content.Load<SpriteFont>("Font")
@@ -22,7 +24,7 @@ type TsuyoGame() as this =
   let mutable textures:(string * Lazy<Texture2D>) list = ["##dummy##",lazy this.Content.Load<Texture2D>("480_16colors_normal")]
 
   let drawTsuyo (tsuyo:Tsuyo) =
-    let fx,fy = float32 (tsuyo.Pos%RowNum*tsuyoWidth), float32 (tsuyo.Pos/RowNum*tsuyoHeight)
+    let fx,fy = float32 (initPointX+tsuyo.Pos%RowNum*tsuyoWidth), float32 (initPointY+(tsuyo.Pos/RowNum-1)*tsuyoHeight)
     textures
     |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None)
     |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White))
@@ -72,7 +74,7 @@ type TsuyoGame() as this =
   do
     this.Content.RootDirectory <- "TsuyoTsuyoContent"
     this.Window.Title <- gameTitle
-    (800,600) ||>
+    (frameWidth,frameHeight) ||>
       fun x y ->
         graphicsDeviceManager.PreferredBackBufferWidth <- x
         graphicsDeviceManager.PreferredBackBufferHeight <- y
