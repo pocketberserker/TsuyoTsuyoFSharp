@@ -4,6 +4,7 @@ open System
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
+open Twitterizer
 open TsuyoTsuyo
 
 type TsuyoGame() as this =
@@ -28,6 +29,26 @@ type TsuyoGame() as this =
     textures
     |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None)
     |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White))
+  
+  let drawNextTsuyo (statusList:TwitterStatus option list) =
+    
+    let count = ref 0
+
+    let draw' = function
+      | TsuyoType.Real status ->
+        status |> (fun s ->
+          textures |> List.tryPick (fun (k,v) -> if k = s.User.ScreenName then Some (k,v) else None)
+          |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(0.f,float32 (tsuyoHeight*(!count))), Color.White)))
+        count := !count + 1
+      | TsuyoType.Dummy ->
+        textures |> List.tryPick (fun (k,v) -> if k = "##dummy##" then Some (k,v) else None)
+        |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(0.f,float32 (tsuyoHeight*(!count))), Color.White))
+        count := !count + 1
+
+    match statusList with
+    | [] -> [TsuyoType.Dummy; TsuyoType.Dummy] |> List.iter (fun x -> draw' x)
+    | [x] -> x |> Option.iter (fun x -> x |> TsuyoType.Real |> draw'); draw' TsuyoType.Dummy
+    | x1::x2::xs -> [x1;x2] |> List.iter (fun x -> x |> Option.iter (fun x -> x |> TsuyoType.Real |> draw'))
       
   let operateKeys () =
     let operateKey =
@@ -52,22 +73,29 @@ type TsuyoGame() as this =
 
   let update (fst:Tsuyo) (snd:Tsuyo) =
 
-    let asyncLoadContent (tsuyo1:Tsuyo) (tsuyo2:Tsuyo) =
+    let asyncLoadContents (statuses:TwitterStatus option list) =
       async {
-        [tsuyo1;tsuyo2]
+        statuses
         |> List.iter (fun x ->
-          if textures |> List.exists (fun (k,v) -> k = x.ScreenName) |> not then
-            let texture = lazy Texture2D.FromStream(this.GraphicsDevice, x.ImageStream.Value) in textures <- (x.ScreenName ,texture)::textures)
+          x |> Option.iter (fun x ->
+            if textures |> List.exists (fun (k,v) -> k = x.User.ScreenName) |> not then
+              let texture = lazy Texture2D.FromStream(this.GraphicsDevice, x |> TsuyoType.Real |> tryGetStream |> Option.get)
+              textures <- (x.User.ScreenName ,texture)::textures))
       } |> Async.Start
+
+    match twitStatusList with
+    | [] -> ()
+    | [x] -> [x] |> asyncLoadContents
+    | x1::x2::xs -> [x1;x2] |> asyncLoadContents
 
     if detectCollision (fst.Pos+RowNum) || detectCollision (snd.Pos+RowNum) then
       ps.Tsuyo2Pos |> function
         | SndTsuyoPos.Right | SndTsuyoPos.Left -> (fst,snd) ||> fun x y -> (fall x), (fall y)
         | _ -> fst,snd
-      |> fun (x,y) -> ps <- createTsuyoObj twitStatusList; asyncLoadContent ps.Tsuyo1 ps.Tsuyo2; [x;y] |> List.iter erase
+      |> fun (x,y) -> ps <- createTsuyoObj twitStatusList; [x;y] |> erase
     else
       ps |> function
-        | CollideBottom -> ps <- createTsuyoObj twitStatusList; asyncLoadContent ps.Tsuyo1 ps.Tsuyo2; [fst;snd] |> List.iter erase
+        | CollideBottom -> ps <- createTsuyoObj twitStatusList; [fst;snd] |> erase
         | _ -> ()
     
 
@@ -93,9 +121,8 @@ type TsuyoGame() as this =
 
   override game.Draw gameTime =
     sprite.Force().Begin()
-    ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.filter (fun (x:Tsuyo) -> x.Hidden |> not) |> List.map drawTsuyo |> ignore
-    twitStatusList |> List.filter (fun x -> x.IsSome)
-    |> List.map (fun x -> sprite.Force().DrawString(font.Force(),x.Value.User.ScreenName,Vector2(300.f,300.f),Color.White)) |> ignore
+    ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.filter (fun (x:Tsuyo) -> x.Hidden |> not) |> List.iter drawTsuyo
+    drawNextTsuyo twitStatusList
     sprite.Force().End()
     base.Draw gameTime
 

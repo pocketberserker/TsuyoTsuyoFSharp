@@ -364,7 +364,7 @@ module 消去 =
 
     Given ("##dummy##",0)
     ||> When getUnion
-    |> When getEraseList
+    |> When getAfterEraseList
     |> It should contain tsuyo1
     |> It should contain tsuyo2
     |> It should contain tsuyo3
@@ -381,7 +381,7 @@ module 消去 =
 
     Given ("##dummy##",0)
     ||> When getUnion
-    |> When getEraseList
+    |> When getAfterEraseList
     |> It should equal []
     |> Verify
 
@@ -400,6 +400,6 @@ module 消去 =
 
     Given ("##dummy##",RowNum+1)
     ||> When getUnion
-    |> When getEraseList
+    |> When getAfterEraseList
     |> It should equal [tsuyo5]
     |> Verify

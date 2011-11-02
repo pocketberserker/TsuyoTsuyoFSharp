@@ -16,6 +16,20 @@ type TsuyoType =
 
 type SndTsuyoPos = | Right | Down | Left | Up
 
+let tryGetStream = function
+  | TsuyoType.Real s ->
+    async {
+      let url = s.User.ProfileImageLocation
+      let req = WebRequest.Create url
+      let! rsp = req.AsyncGetResponse()
+
+      use stream = rsp.GetResponseStream()
+      use read = new BufferedStream(stream)
+      let! byteData = read.AsyncRead(int rsp.ContentLength)
+      return new MemoryStream(byteData) :> Stream
+      } |> Async.RunSynchronously |> Some
+  | TsuyoType.Dummy -> None
+
 type Tsuyo (pos:int, status:TsuyoType) =
 
   let mutable position = pos
@@ -24,26 +38,9 @@ type Tsuyo (pos:int, status:TsuyoType) =
     if position < RowNum then true
     else false
 
-  let stream () =
-    match status with
-    | TsuyoType.Real s ->
-      async {
-        let url = s.User.ProfileImageLocation
-        let req = WebRequest.Create url
-        let! rsp = req.AsyncGetResponse()
-
-        use stream = rsp.GetResponseStream()
-        use read = new BufferedStream(stream)
-        let! byteData = read.AsyncRead(int rsp.ContentLength)
-        return new MemoryStream(byteData) :> Stream
-      } |> Async.RunSynchronously |> Some
-    | TsuyoType.Dummy -> None
-
   member x.Pos with get() = position and set(p) = position <- p
     
   member x.Hidden = isHidden()
-
-  member x.ImageStream = stream ()
 
   member x.ScreenName = 
     match status with
@@ -198,11 +195,10 @@ let getUnion name pos =
 
   getUnion' name pos []
 
-let getEraseList (list:Tsuyo list) =
+let getAfterEraseList (list:Tsuyo list) =
   if List.length list < EraseNum then fieldTsuyo
   else list |> List.fold (fun result x -> result |> List.filter (fun y -> x <> y)) fieldTsuyo
 
-let erase (tsuyo:Tsuyo) =
-  fieldTsuyo <- tsuyo::fieldTsuyo
-  let union = getUnion tsuyo.ScreenName tsuyo.Pos
-  if List.length union >= EraseNum then union |> getEraseList |> fun list -> fieldTsuyo <- list 
+let erase (tlist:Tsuyo list) =
+  tlist |> List.map (fun tsuyo -> fieldTsuyo <- tsuyo::fieldTsuyo; getUnion tsuyo.ScreenName tsuyo.Pos)
+  |> List.filter (fun x -> List.length x >= EraseNum) |> List.concat |> getAfterEraseList |> fun list -> fieldTsuyo <- list
