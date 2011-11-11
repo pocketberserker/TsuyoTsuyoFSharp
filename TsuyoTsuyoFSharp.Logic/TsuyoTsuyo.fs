@@ -4,6 +4,7 @@ open Twitterizer
 open System.IO
 open System.Net
 open Microsoft.FSharp.Control.WebExtensions
+open System.Windows.Media.Imaging
 
 let RowNum = 6
 let ColNum = 13
@@ -172,10 +173,6 @@ let createTsuyoObj =
   | [] -> twitStatusList <- []; new TsuyoObj(None,None)
   | [x] -> twitStatusList <- []; new TsuyoObj(x,None)
   | x::xs -> twitStatusList <- xs |> List.tail; new TsuyoObj(x, xs |> List.head)
-
-let created x = twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
-
-let start () = TwitStream.start "" created
 
 let getUnion name pos =
 

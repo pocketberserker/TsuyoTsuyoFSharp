@@ -1,9 +1,15 @@
 ﻿module TsuyoGame
 
 open System
+open System.Collections.Generic
 open Microsoft.Xna.Framework
 open Microsoft.Xna.Framework.Graphics
 open Microsoft.Xna.Framework.Input
+open System.Windows.Forms
+open System.Windows.Forms.Integration
+open System.Windows
+open System.Windows.Controls
+open System.Windows.Media.Imaging
 open Twitterizer
 open TsuyoTsuyo
 
@@ -23,6 +29,25 @@ type TsuyoGame() as this =
   let mutable ps = createTsuyoObj twitStatusList
 
   let mutable textures:(string * Lazy<Texture2D>) list = ["##dummy##",lazy this.Content.Load<Texture2D>("480_16colors_normal")]
+  let mutable bitmaps = ["##dummy##",BitmapFrame.Create(new System.Uri("480_16colors_normal.png", System.UriKind.Relative))]
+
+  let viewmodel = new TweetViewModel.ViewModel()
+
+  let created x =
+
+    let asyncLoadBitmapFrame (status:TwitterStatus) =
+      async {
+        status
+        |> (fun x ->
+          if bitmaps |> List.exists (fun (k,v) -> k = x.User.ScreenName) |> not then
+            use stream = x |> TsuyoType.Real |> tryGetStream |> Option.get
+            bitmaps <- (x.User.ScreenName, BitmapFrame.Create(stream))::bitmaps)
+      } |> Async.Start
+
+    twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
+    x |> asyncLoadBitmapFrame
+
+  let start () = TwitStream.start "" created
 
   let drawTsuyo (tsuyo:Tsuyo) =
     let fx,fy = float32 (initPointX+tsuyo.Pos%RowNum*tsuyoWidth), float32 (initPointY+(tsuyo.Pos/RowNum-1)*tsuyoHeight)
@@ -30,40 +55,40 @@ type TsuyoGame() as this =
     |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None)
     |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White))
   
-  let drawNextTsuyo (statusList:TwitterStatus option list) =
+  let updateNextTsuyo (statusList:TwitterStatus option list) =
     
-    let count = ref 0
+    let items = new List<TweetModel.Model>()
 
     let draw' = function
       | TsuyoType.Real status ->
         status |> (fun s ->
-          textures |> List.tryPick (fun (k,v) -> if k = s.User.ScreenName then Some (k,v) else None)
-          |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(0.f,float32 (tsuyoHeight*(!count))), Color.White)))
-        count := !count + 1
+          bitmaps |> List.tryPick (fun (k,v) -> if k = s.User.ScreenName then Some (k,v) else None)
+          |> Option.iter (fun (_,v) -> let model = new TweetModel.Model() in model.Image <- v; model.Text <- s.Text; items.Add model))
       | TsuyoType.Dummy ->
-        textures |> List.tryPick (fun (k,v) -> if k = "##dummy##" then Some (k,v) else None)
-        |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(0.f,float32 (tsuyoHeight*(!count))), Color.White))
-        count := !count + 1
+        bitmaps |> List.tryPick (fun (k,v) -> if k = "##dummy##" then Some (k,v) else None)
+        |> Option.iter (fun (_,v) -> let model = new TweetModel.Model() in model.Image <- v; model.Text <- ""; items.Add model)
 
     match statusList with
     | [] -> [TsuyoType.Dummy; TsuyoType.Dummy] |> List.iter (fun x -> draw' x)
     | [x] -> x |> Option.iter (fun x -> x |> TsuyoType.Real |> draw'); draw' TsuyoType.Dummy
     | x1::x2::xs -> [x1;x2] |> List.iter (fun x -> x |> Option.iter (fun x -> x |> TsuyoType.Real |> draw'))
-      
+    items.Reverse()
+    viewmodel.Items <- items
+
   let operateKeys () =
     let operateKey =
       function
-      | Keys.Z -> rotateL ps
-      | Keys.X -> rotateR ps
-      | Keys.Left ->
+      | Microsoft.Xna.Framework.Input.Keys.Z -> rotateL ps
+      | Microsoft.Xna.Framework.Input.Keys.X -> rotateR ps
+      | Microsoft.Xna.Framework.Input.Keys.Left ->
         ps |> function
           | CollideLeftWall -> ps
           | _ -> if detectCollision (ps.Tsuyo1.Pos-1) || detectCollision (ps.Tsuyo2.Pos - 1) then ps else move ps Direction.Left
-      | Keys.Right ->
+      | Microsoft.Xna.Framework.Input.Keys.Right ->
         ps |> function
           | CollideRightWall -> ps
           | _ -> if detectCollision (ps.Tsuyo1.Pos+1) || detectCollision (ps.Tsuyo2.Pos + 1) then ps else move ps Direction.Right
-      | Keys.Down ->
+      | Microsoft.Xna.Framework.Input.Keys.Down ->
         move ps Direction.Down
       | _ -> ps
       
@@ -97,7 +122,6 @@ type TsuyoGame() as this =
       ps |> function
         | CollideBottom -> ps <- createTsuyoObj twitStatusList; [fst;snd] |> erase
         | _ -> ()
-    
 
   do
     this.Content.RootDirectory <- "TsuyoTsuyoContent"
@@ -111,6 +135,13 @@ type TsuyoGame() as this =
   override game.Initialize () =
     graphicsDeviceManager.GraphicsProfile <- GraphicsProfile.HiDef
     graphicsDeviceManager.ApplyChanges()
+    let elementHost = new ElementHost()
+    elementHost.Location <- new System.Drawing.Point(0,0)
+    elementHost.Size <- new System.Drawing.Size(800,96)
+    let control = Application.LoadComponent(new System.Uri("/tsuyofs;component/TweetView.xaml", System.UriKind.Relative)) :?> UserControl
+    control.DataContext <- viewmodel
+    elementHost.Child <- control
+    Control.FromHandle(game.Window.Handle).Controls.Add elementHost
     base.Initialize()
 
   override game.BeginRun () = async { start () } |> Async.Start
@@ -122,7 +153,7 @@ type TsuyoGame() as this =
   override game.Draw gameTime =
     sprite.Force().Begin()
     ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.filter (fun (x:Tsuyo) -> x.Hidden |> not) |> List.iter drawTsuyo
-    drawNextTsuyo twitStatusList
+    updateNextTsuyo twitStatusList
     sprite.Force().End()
     base.Draw gameTime
 
@@ -131,6 +162,7 @@ type TsuyoGame() as this =
     base.EndRun()
 
 module Program =
+  [<STAThread>]
   [<EntryPoint>]
   let main args =
     use game = new TsuyoGame() in

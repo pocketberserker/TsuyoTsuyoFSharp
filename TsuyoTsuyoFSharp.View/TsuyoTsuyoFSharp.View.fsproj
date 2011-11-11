@@ -9,7 +9,7 @@
     <ProjectGuid>{5ca8455a-5bd9-4107-be61-92a70c5f4186}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>GameXna</RootNamespace>
-    <AssemblyName>GameXna</AssemblyName>
+    <AssemblyName>tsuyofs</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -29,7 +29,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <PlatformTarget>x86</PlatformTarget>
-    <DocumentationFile>bin\Debug\GameXna.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\tsuyofs.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <DebugType>pdbonly</DebugType>
@@ -47,15 +47,27 @@
   <ItemGroup>
     <Compile Include="TsuyoGame.fs" />
     <None Include="packages.config" />
+    <Resource Include="TweetView.xaml" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FsTwitStream\FsTwitStream.fsproj">
+      <Name>FsTwitStream</Name>
+      <Project>{5a16f404-f10c-4894-953f-4d5d2fd1548e}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\TsuyoTsuyoContent\TsuyoTsuyoContent.contentproj">
       <Name>TsuyoTsuyoContent</Name>
       <Project>{5C3F5590-A8E7-486C-B8C7-EE424D7F5AD6}</Project>
       <XnaReferenceType>Content</XnaReferenceType>
     </ProjectReference>
+    <ProjectReference Include="..\TsuyoTsuyoFSharp.ViewModel\TsuyoTsuyoFSharp.ViewModel.fsproj">
+      <Name>TsuyoTsuyoFSharp.ViewModel</Name>
+      <Project>{e0b39e8e-346a-448b-bbba-acf87c9abf44}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="Accessibility" />
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
     <Reference Include="Microsoft.Xna.Framework.GamerServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
@@ -65,9 +77,12 @@
       <HintPath>..\packages\Newtonsoft.Json.3.5.8\lib\35\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <ProjectReference Include="..\TsuyoTsuyoFSharp.Logic\TsuyoTsuyoFSharp.Logic.fsproj">
@@ -77,11 +92,17 @@
     </ProjectReference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="Twitterizer2">
       <HintPath>..\packages\twitterizer.2.3.3\lib\35\Twitterizer2.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="UIAutomationProvider" />
+    <Reference Include="UIAutomationTypes" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
 	     Other similar extension points exist, see Microsoft.Common.targets.
