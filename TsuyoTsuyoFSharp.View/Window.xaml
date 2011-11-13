@@ -1,0 +1,25 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="つよつよえふしゃ～ぷ！" Height="700" Width="800">
+    <Grid x:Name="content">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <DataGrid AutoGenerateColumns="False" Height="100" HorizontalAlignment="Left" VerticalAlignment="Top"
+                  Width="800" HeadersVisibility="None" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden"
+                  CanUserResizeColumns="False" CanUserAddRows="False" CanUserSortColumns="False" CanUserDeleteRows="False"
+                  CanUserResizeRows="False"  ItemsSource="{Binding Items}">
+            <DataGrid.Columns>
+                <DataGridTemplateColumn IsReadOnly="True">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding Image, UpdateSourceTrigger=PropertyChanged}" Width="48" Height="48" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            <DataGridTextColumn Binding="{Binding Text, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="True" Width="750" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

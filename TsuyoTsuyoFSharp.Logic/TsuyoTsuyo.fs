@@ -173,10 +173,6 @@ let createTsuyoObj =
   | [x] -> twitStatusList <- []; new TsuyoObj(x,None)
   | x::xs -> twitStatusList <- xs |> List.tail; new TsuyoObj(x, xs |> List.head)
 
-let created x = twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
-
-let start () = TwitStream.start "" created
-
 let getUnion name pos =
 
   let rec getSetList result list =
