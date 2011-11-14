@@ -132,11 +132,11 @@ type TsuyoGame(viewmodel:TweetViewModel.ViewModel) as this =
       ps |> function
         | CollideBottom -> ps <- createTsuyoObj twitStatusList; [fst;snd] |> erase
         | _ -> ()
+    updateNextTsuyo twitStatusList
 
   let draw () =
     sprite.Force().Begin()
     ps.Tsuyo1 :: ps.Tsuyo2 :: fieldTsuyo |> List.filter (fun (x:Tsuyo) -> x.Hidden |> not) |> List.iter drawTsuyo
-    updateNextTsuyo twitStatusList
     sprite.Force().End()
     let rect = Nullable(new Rectangle(0, 125,frameWidth+183, frameHeight+105));
     graphicsDevice.Force().Present(Nullable(),rect,handle.Force())
