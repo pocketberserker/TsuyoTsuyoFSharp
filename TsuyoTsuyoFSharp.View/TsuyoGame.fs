@@ -52,7 +52,8 @@ type TsuyoGame(viewmodel:TweetViewModel.ViewModel) as this =
           if bitmaps |> List.exists (fun (k,v) -> k = x.User.ScreenName) |> not then
             let stream = x |> TsuyoType.Real |> tryGetStream |> Option.get
             streams <- stream::streams
-            bitmaps <- (x.User.ScreenName, BitmapFrame.Create(stream))::bitmaps)
+            let bitmap = BitmapFrame.Create(stream,BitmapCreateOptions.IgnoreColorProfile,BitmapCacheOption.Default)
+            bitmaps <- (x.User.ScreenName, bitmap)::bitmaps)
       } |> Async.Start
 
     twitStatusList <- Some x :: (twitStatusList |> List.rev) |> List.rev
