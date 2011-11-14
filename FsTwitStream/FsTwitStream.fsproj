@@ -34,14 +34,16 @@
   <Import Project="$(MSBuildExtensionsPath32)\FSharp\1.0\Microsoft.FSharp.Targets" Condition="!Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <Import Project="$(MSBuildExtensionsPath32)\..\Microsoft F#\v4.0\Microsoft.FSharp.Targets" Condition=" Exists('$(MSBuildBinPath)\Microsoft.Build.Tasks.v4.0.dll')" />
   <ItemGroup>
-    <None Include="packages.config" />
     <Compile Include="TwitStream.fs" />
+    <None Include="packages.config" />
+    <Content Include="Json.NET.license.txt" />
+    <Content Include="GettingStarted.txt" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\twitterizer-streaming.2.3.3\lib\35\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -53,11 +55,11 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
     <Reference Include="Twitterizer2">
-      <HintPath>..\packages\twitterizer.2.3.3\lib\35\Twitterizer2.dll</HintPath>
+      <HintPath>..\packages\twitterizer.2.4.0.26532\lib\net40\Twitterizer2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Twitterizer2.Streaming">
-      <HintPath>..\packages\twitterizer-streaming.2.3.3\lib\35\Twitterizer2.Streaming.dll</HintPath>
+      <HintPath>..\packages\twitterizer-streaming.2.4.0.26649\lib\net40\Twitterizer2.Streaming.dll</HintPath>
       <Private>True</Private>
     </Reference>
   </ItemGroup>

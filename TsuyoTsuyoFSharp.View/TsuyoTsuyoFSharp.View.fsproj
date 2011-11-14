@@ -47,7 +47,10 @@
   <ItemGroup>
     <Compile Include="TsuyoGame.fs" />
     <Resource Include="Window.xaml" />
+    <None Include="app.config" />
     <None Include="packages.config" />
+    <Content Include="Json.NET.license.txt" />
+    <Content Include="GettingStarted.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FsTwitStream\FsTwitStream.fsproj">
@@ -60,8 +63,6 @@
       <Project>{b597397c-5246-4957-a79e-3bea7bffb897}</Project>
       <Private>True</Private>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="Accessibility" />
     <Reference Include="Microsoft.Xna.Framework, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
     <Reference Include="Microsoft.Xna.Framework.Game, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
@@ -69,7 +70,7 @@
     <Reference Include="Microsoft.Xna.Framework.Graphics, Version=4.0.0.0, Culture=neutral, PublicKeyToken=842cf8be1de50553" />
     <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.3.5.8\lib\35\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.4.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
@@ -92,7 +93,7 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="Twitterizer2">
-      <HintPath>..\packages\twitterizer.2.3.3\lib\35\Twitterizer2.dll</HintPath>
+      <HintPath>..\packages\twitterizer.2.4.0.26532\lib\net40\Twitterizer2.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="UIAutomationProvider" />

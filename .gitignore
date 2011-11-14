@@ -4,3 +4,4 @@ packages/
 *.suo
 *.png
 *.cachefile
+*.txt
