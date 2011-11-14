@@ -41,6 +41,7 @@ type TsuyoGame(viewmodel:TweetViewModel.ViewModel) as this =
   let mutable textures:(string * Lazy<Texture2D>) list = ["##dummy##",lazy Texture2D.FromStream(graphicsDevice.Force(),"480_16colors_normal.png" |> File.OpenRead)]
 
   let mutable bitmaps = ["##dummy##",BitmapFrame.Create(new System.Uri("480_16colors_normal.png", System.UriKind.Relative))]
+  let mutable streams = []
 
   let created x =
 
@@ -49,7 +50,8 @@ type TsuyoGame(viewmodel:TweetViewModel.ViewModel) as this =
         status
         |> (fun x ->
           if bitmaps |> List.exists (fun (k,v) -> k = x.User.ScreenName) |> not then
-            use stream = x |> TsuyoType.Real |> tryGetStream |> Option.get
+            let stream = x |> TsuyoType.Real |> tryGetStream |> Option.get
+            streams <- stream::streams
             bitmaps <- (x.User.ScreenName, BitmapFrame.Create(stream))::bitmaps)
       } |> Async.Start
 
@@ -63,7 +65,11 @@ type TsuyoGame(viewmodel:TweetViewModel.ViewModel) as this =
     if tsuyo.Hidden then ()
     textures
     |> List.tryPick (fun (k,v) -> if k = tsuyo.ScreenName then Some (k,v) else None)
-    |> Option.iter (fun (_,v) -> sprite.Force().Draw(v.Force(), Vector2(fx,fy), Color.White))
+    |> Option.iter begin 
+        fun (_,v) ->
+          let scale = new Vector2(float32 tsuyoWidth / float32 (v.Force().Width), float32 tsuyoHeight / float32 (v.Force().Height))
+          sprite.Force().Draw(v.Force(), Vector2(fx,fy), Nullable(), Color.White, 0.0f, Vector2.Zero, scale, SpriteEffects.None, 0.0f)
+      end
   
   let updateNextTsuyo (statusList:TwitterStatus option list) =
     
@@ -152,7 +158,11 @@ type TsuyoGame(viewmodel:TweetViewModel.ViewModel) as this =
      |> ignore
 
   do this.Dispatcher.ShutdownStarted
-     |> Observable.subscribe (fun _ -> timer.Stop(); textures |> List.iter (fun (_,v) -> v.Force().Dispose()); graphicsDevice.Force().Dispose() )
+     |> Observable.subscribe (fun _ -> 
+       timer.Stop()
+       textures |> List.iter (fun (_,v) -> v.Force().Dispose())
+       streams |> List.iter (fun s -> s.Close())
+       graphicsDevice.Force().Dispose() )
      |> ignore
 
   do this.Loaded
